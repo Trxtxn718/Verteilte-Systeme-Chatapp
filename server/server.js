@@ -132,7 +132,22 @@ app.get('/database', (req, res) => {
         }
     });
 });
-
+app.get('/database2', (req, res) => {
+    console.log("Request to load all entries from table1");
+    // Prepare the get query
+    connection.query("SELECT * FROM `Users`;", function (error, results, fields) {
+        if (error) {
+            // we got an errror - inform the client
+            console.error(error); // <- log error in server
+            res.status(500).json(error); // <- send to client
+        } else {
+            // we got no error - send it to the client
+            console.log('Success answer from DB: ', results); // <- log results in console
+            // INFO: Here could be some code to modify the result
+            res.status(200).json(results); // <- send it to client
+        }
+    });
+});
 // DELETE path for database
 app.delete('/database/:id', (req, res) => {
     // This path will delete an entry. For example the path would look like DELETE '/database/5' -> This will delete number 5

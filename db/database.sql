@@ -1,69 +1,52 @@
--- phpMyAdmin SQL Dump
--- version 5.0.2
--- https://www.phpmyadmin.net/
---
--- Host: meinecooledb
--- Generation Time: Apr 09, 2020 at 12:19 PM
--- Server version: 10.4.12-MariaDB-1:10.4.12+maria~bionic
--- PHP Version: 7.4.4
+CREATE TABLE
+  `GroupChats` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY
+  );
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+CREATE TABLE
+  `Users` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `email` TEXT NOT NULL,
+    `username` TEXT NOT NULL,
+    `password` TEXT NOT NULL,
+    `profile_img` TEXT NOT NULL,
+    `created` DATETIME NOT NULL,
+    `updated` DATETIME NOT NULL
+  );
 
+-- CREATE TABLE
+--   `DirectChats` (
+--     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+--     `user_1` BIGINT NOT NULL,
+--     `user_2` BIGINT NOT NULL
+--   );
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+-- ALTER TABLE `DirectChats` ADD INDEX `directchats_user_1_index` (`user_1`);
 
---
--- Database: `exampledb`
---
+-- ALTER TABLE `DirectChats` ADD INDEX `directchats_user_2_index` (`user_2`);
 
--- --------------------------------------------------------
+-- CREATE TABLE
+--   `Messages` (
+--     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+--     `chat_id` BIGINT NOT NULL,
+--     `user_id` BIGINT NOT NULL,
+--     `content` BIGINT NOT NULL
+--   );
 
---
--- Table structure for table `table1`
---
+-- ALTER TABLE `Messages` ADD INDEX `messages_chat_id_index` (`chat_id`);
 
-CREATE TABLE `table1` (
-  `task_id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+-- ALTER TABLE `Messages` ADD INDEX `messages_user_id_index` (`user_id`);
 
---
--- Dumping data for table `table1`
---
+-- ALTER TABLE `Messages` ADD CONSTRAINT `messages_chat_id_foreign` FOREIGN KEY (`chat_id`) REFERENCES `DirectChats` (`id`);
 
-INSERT INTO `table1` (`task_id`, `title`, `description`, `created_at`) VALUES
-(1, 'Super titel', 'langer text', '2020-04-09 12:18:07'),
-(2, 'Anderer Titel', 'Super Text', '2020-04-09 12:18:43'),
-(3, 'Anderer Titel2', 'noch mehr text', '2020-04-09 12:18:57');
+-- ALTER TABLE `DirectChats` ADD CONSTRAINT `directchats_user_1_foreign` FOREIGN KEY (`user_1`) REFERENCES `Users` (`id`);
 
---
--- Indexes for dumped tables
---
+-- ALTER TABLE `DirectChats` ADD CONSTRAINT `directchats_user_2_foreign` FOREIGN KEY (`user_2`) REFERENCES `Users` (`id`);
+
+-- ALTER TABLE `Messages` ADD CONSTRAINT `messages_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`);
 
 --
--- Indexes for table `table1`
---
-ALTER TABLE `table1`
-  ADD PRIMARY KEY (`task_id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `table1`
---
-ALTER TABLE `table1`
-  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+INSERT INTO
+  `Users` (`id`, `username`, `email`,`password`, `profile_img`, `created`, `updated`)
+VALUES
+  (1, 'Tristan', 't.t@t.de','1234', 'test_img' ,'2020-04-09 12:18:07','2020-04-09 12:18:07');

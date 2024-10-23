@@ -6,7 +6,7 @@ const express = require('express');
 const mysql = require('mysql');
 // Database connection info - used from environment variables
 var dbInfo = {
-    connectionLimit : 10,
+    connectionLimit: 10,
     host: process.env.MYSQL_HOSTNAME,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
@@ -54,32 +54,9 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
-app.get('/', (req, res) => {
+const UserRouter = require('./User/UserRouter');
 
-    res.status(200)
-});
-
-// ###################### DATABASE PART ######################
-app.get('/users', (req, res) => {
-    console.log("Request to load all entries from table1");
-    // Prepare the get query
-    connection.query("SELECT * FROM `Users`;", function (error, results, fields) {
-        if (error) {
-            // we got an errror - inform the client
-            console.error(error); // <- log error in server
-            res.status(500).json(error); // <- send to client
-        } else {
-            // we got no error - send it to the client
-            console.log('Success answer from DB: ', results); // <- log results in console
-            // INFO: Here could be some code to modify the result
-            res.status(200).json(results); // <- send it to client
-        }
-    });
-});
-
-
-// ###################### DATABASE PART END ######################
+app.use('/users', UserRouter);
 
 
 

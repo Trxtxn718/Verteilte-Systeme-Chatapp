@@ -2,7 +2,10 @@
 
 const express = require('express');
 const { Sequelize} = require('sequelize');
+
+// Import the models
 const { Users } = require('./models/Users');
+const { Messages } = require('./models/Messages');
 
 // Constants
 const PORT = process.env.PORT || 8080;
@@ -43,7 +46,6 @@ app.get('/users', (req, res) => {
         console.log("Models funktioniert");
         res.json(users);
     });
-    
 });
 
 

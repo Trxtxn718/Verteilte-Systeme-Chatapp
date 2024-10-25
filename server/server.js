@@ -3,6 +3,10 @@
 const express = require('express');
 const { Sequelize} = require('sequelize');
 
+// Import the models
+const { Users } = require('./models/Users');
+const { Messages } = require('./models/Messages');
+const { DirectChat } = require('./models/DirectChats');
 
 // Constants
 const PORT = process.env.PORT || 8080;
@@ -17,6 +21,7 @@ const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_US
     host: process.env.MYSQL_HOSTNAME,
     port: 3306,
     dialect: 'mariadb',
+    models: [__dirname + '/models'],
     define: {
         timestamps: false
     }
@@ -36,20 +41,12 @@ sequelize.authenticate()
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
-app.get('/', (req, res) => {
-
-    res.status(200)
-});
-
 // ###################### DATABASE PART ######################
 app.get('/users', (req, res) => {
-    sequelize.query('SELECT * FROM Users', { type: sequelize.QueryTypes.SELECT })
-        .then(users => {
-            console.log(users);
-            res.json(users);
-        });
-
+    Users.findAll().then(users => {
+        console.log("Models funktioniert");
+        res.json(users);
+    });
 });
 
 

@@ -1,47 +1,12 @@
 'use strict';
 
 const express = require('express');
+const { Sequelize} = require('sequelize');
 
-// Database
-const mysql = require('mysql');
-// Database connection info - used from environment variables
-var dbInfo = {
-    connectionLimit: 10,
-    host: process.env.MYSQL_HOSTNAME,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-};
-
-var connection = mysql.createPool(dbInfo);
-console.log("Conecting to database...");
-// connection.connect(); <- connect not required in connection pool
-
-// SQL Database init.
-// In this current demo, this is done by the "database.sql" file which is stored in the "db"-container (./db/).
-// Alternative you could use the mariadb basic sample and do the following steps here:
-/*
-connection.query("CREATE TABLE IF NOT EXISTS table1 (task_id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)  ENGINE=INNODB;", function (error, results, fields) {
-    if (error) throw error;
-    console.log('Answer: ', results);
-});
-*/
-// See readme.md for more information about that.
-
-// Check the connection
-connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
-    if (error) throw error; // <- this will throw the error and exit normally
-    // check the solution - should be 2
-    if (results[0].solution == 2) {
-        // everything is fine with the database
-        console.log("Database connected and works");
-    } else {
-        // connection is not fine - please check
-        console.error("There is something wrong with your database connection! Please check");
-        process.exit(5); // <- exit application with error code e.g. 5
-    }
-});
-
+// Import the models
+const { Users } = require('./models/Users');
+const { Messages } = require('./models/Messages');
+const { DirectChat } = require('./models/DirectChats');
 
 // Constants
 const PORT = process.env.PORT || 8080;
@@ -50,13 +15,58 @@ const HOST = '0.0.0.0';
 // App
 const app = express();
 
+// Database connection
+
+const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_PASSWORD, {
+    host: process.env.MYSQL_HOSTNAME,
+    port: 3306,
+    dialect: 'mariadb',
+    models: [__dirname + '/models'],
+    define: {
+        timestamps: false
+    }
+});
+
+// Test the database connection
+sequelize.authenticate()
+    .then(() => {
+        console.log('Connection has been established successfully.');
+    })
+    .catch(err => {
+        console.error('Unable to connect to the database:', err);
+    });
+
+
 // Features for JSON Body
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const UserRouter = require('./User/UserRouter');
+// Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
+app.get('/', (req, res) => {
 
-app.use('/users', UserRouter);
+    res.status(200)
+});
+
+// ###################### DATABASE PART ######################
+app.get('/users', (req, res) => {
+    console.log("Request to load all entries from table1");
+    // Prepare the get query
+    connection.query("SELECT * FROM `Users`;", function (error, results, fields) {
+        if (error) {
+            // we got an errror - inform the client
+            console.error(error); // <- log error in server
+            res.status(500).json(error); // <- send to client
+        } else {
+            // we got no error - send it to the client
+            console.log('Success answer from DB: ', results); // <- log results in console
+            // INFO: Here could be some code to modify the result
+            res.status(200).json(results); // <- send it to client
+        }
+    });
+});
+
+
+// ###################### DATABASE PART END ######################
 
 
 

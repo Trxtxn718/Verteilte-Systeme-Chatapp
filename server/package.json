@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "express": "^4.21",
-    "mysql": "^2.18"
+    "mariadb": "^3.3.2",
+    "mysql": "^2.18",
+    "sequelize": "^6.37.4"
   }
 }

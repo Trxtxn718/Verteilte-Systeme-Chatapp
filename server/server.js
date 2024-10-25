@@ -15,7 +15,11 @@ const app = express();
 
 const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_PASSWORD, {
     host: process.env.MYSQL_HOSTNAME,
-    dialect: 'mariadb'
+    port: 3306,
+    dialect: 'mariadb',
+    define: {
+        timestamps: false
+    }
 });
 
 // Test the database connection
@@ -40,20 +44,12 @@ app.get('/', (req, res) => {
 
 // ###################### DATABASE PART ######################
 app.get('/users', (req, res) => {
-    console.log("Request to load all entries from table1");
-    // Prepare the get query
-    connection.query("SELECT * FROM `Users`;", function (error, results, fields) {
-        if (error) {
-            // we got an errror - inform the client
-            console.error(error); // <- log error in server
-            res.status(500).json(error); // <- send to client
-        } else {
-            // we got no error - send it to the client
-            console.log('Success answer from DB: ', results); // <- log results in console
-            // INFO: Here could be some code to modify the result
-            res.status(200).json(results); // <- send it to client
-        }
-    });
+    sequelize.query('SELECT * FROM Users', { type: sequelize.QueryTypes.SELECT })
+        .then(users => {
+            console.log(users);
+            res.json(users);
+        });
+
 });
 
 

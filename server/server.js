@@ -6,6 +6,7 @@ const { Sequelize} = require('sequelize');
 // Import the models
 const { Users } = require('./models/Users');
 const { Messages } = require('./models/Messages');
+const { DirectChat } = require('./models/DirectChats');
 
 // Constants
 const PORT = process.env.PORT || 8080;

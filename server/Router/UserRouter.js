@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
+const { Users } = require('../models/Users');
+
 router.get('/', (req, res) => {
-    connection.query("SELECT * FROM `Users`;", function (error, results, fields) {
-        if (error) {
-            console.error(error); 
-            res.status(500).json(error); 
-        } else {
-            console.log('Success answer from DB: ', results); 
-            res.status(200).json(results);
-        }
+    console.log("Request to load all entries from table1");
+    // Prepare the get query
+    Users.findAll().then(users => {
+        res.status(200).json(users);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json(err);
     });
 });
+
+module.exports = router;

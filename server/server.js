@@ -8,6 +8,9 @@ const { Users } = require('./models/Users');
 const { Messages } = require('./models/Messages');
 const { DirectChat } = require('./models/DirectChats');
 
+// Import the routers
+const UserRouter = require('./Router/UserRouter');
+
 // Constants
 const PORT = process.env.PORT || 8080;
 const HOST = '0.0.0.0';
@@ -37,42 +40,14 @@ sequelize.authenticate()
     });
 
 
+// Routes
+app.use('/users', UserRouter);
+
+
 // Features for JSON Body
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Entrypoint - call it with: http://localhost:8080/ -> redirect you to http://localhost:8080/static
-app.get('/', (req, res) => {
-
-    res.status(200)
-});
-
-// ###################### DATABASE PART ######################
-app.get('/users', (req, res) => {
-    console.log("Request to load all entries from table1");
-    // Prepare the get query
-    connection.query("SELECT * FROM `Users`;", function (error, results, fields) {
-        if (error) {
-            // we got an errror - inform the client
-            console.error(error); // <- log error in server
-            res.status(500).json(error); // <- send to client
-        } else {
-            // we got no error - send it to the client
-            console.log('Success answer from DB: ', results); // <- log results in console
-            // INFO: Here could be some code to modify the result
-            res.status(200).json(results); // <- send it to client
-        }
-    });
-});
-
-
-// ###################### DATABASE PART END ######################
-
-
-
-
-// All requests to /static/... will be redirected to static files in the folder "public"
-// call it with: http://localhost:8080/static
 app.use('/static', express.static('public'))
 
 // Start the actual server

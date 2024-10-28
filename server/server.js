@@ -8,6 +8,9 @@ const { Users } = require('./models/Users');
 const { Messages } = require('./models/Messages');
 const { DirectChat } = require('./models/DirectChats');
 
+// Import the routers
+const UserRouter = require('./Router/UserRouter');
+
 // Constants
 const PORT = process.env.PORT || 8080;
 const HOST = '0.0.0.0';
@@ -37,30 +40,21 @@ sequelize.authenticate()
     });
 
 
+
+
+
 // Features for JSON Body
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ###################### DATABASE PART ######################
-app.get('/users', (req, res) => {
-    Users.findAll().then(users => {
-        console.log("Models funktioniert");
-        res.json(users);
-    });
-});
-
-
-// ###################### DATABASE PART END ######################
-
-
-
-// All requests to /static/... will be redirected to static files in the folder "public"
-// call it with: http://localhost:8080/static
 app.use('/static', express.static('public'))
 
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
+
+// Routes
+app.use('/users', UserRouter);
 
 // Start database connection
 const sleep = (milliseconds) => {

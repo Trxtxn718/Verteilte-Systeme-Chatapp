@@ -40,8 +40,7 @@ sequelize.authenticate()
     });
 
 
-// Routes
-app.use('/users', UserRouter);
+
 
 
 // Features for JSON Body
@@ -53,6 +52,9 @@ app.use('/static', express.static('public'))
 // Start the actual server
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
+
+// Routes
+app.use('/users', UserRouter);
 
 // Start database connection
 const sleep = (milliseconds) => {

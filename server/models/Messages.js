@@ -1,4 +1,6 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
+const { DirectChats } = require('./DirectChats');
+const { Users } = require('./Users');
 const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_PASSWORD, {
     host: process.env.MYSQL_HOSTNAME,
     port: 3306,
@@ -22,7 +24,7 @@ Messages.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'Users',
+                model: Users,
                 key: 'id'
             }
 
@@ -31,7 +33,7 @@ Messages.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'Chats',
+                model: DirectChats,
                 key: 'id'
             }
         },
@@ -47,6 +49,6 @@ Messages.init(
     },
 );
 
-console.log("Messages",Messages === sequelize.models.Messages); // true
+console.log(Messages === sequelize.models.Messages); // true
 
 module.exports = { Messages, sequelize };

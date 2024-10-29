@@ -6,7 +6,7 @@ const { Sequelize} = require('sequelize');
 // Import the models
 const { Users } = require('./models/Users');
 const { Messages } = require('./models/Messages');
-const { DirectChat } = require('./models/DirectChats');
+const { DirectChats } = require('./models/DirectChats');
 
 // Import the routers
 const UserRouter = require('./Router/UserRouter');
@@ -39,7 +39,17 @@ sequelize.authenticate()
         console.error('Unable to connect to the database:', err);
     });
 
+Users.sync({force:true}).then(result =>{
+    console.log("Created users table")
+})
 
+Messages.sync({force:true}).then(result =>{
+    console.log("Created messages table")
+})
+
+DirectChats.sync({force:true}).then(result =>{
+    console.log("Created DirectChats table")
+})
 
 
 

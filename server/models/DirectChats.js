@@ -8,9 +8,9 @@ const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_US
     }
 });
 
-class DirectChat extends Model { }
+class DirectChats extends Model { }
 
-DirectChat.init(
+DirectChats.init(
     {
         // Model attributes are defined here
         id: {
@@ -39,10 +39,10 @@ DirectChat.init(
     {
         // Other model options go here
         sequelize, // We need to pass the connection instance
-        modelName: 'Chats', // We need to choose the model name
+        modelName: 'DirectChats', // We need to choose the model name
     },
 );
 
-console.log(DirectChat === sequelize.models.DirectChat); // true
+console.log("DirectChat:",DirectChats === sequelize.models.DirectChats); // true
 
-module.exports = { DirectChat, sequelize };
+module.exports = { DirectChats, sequelize };

@@ -51,6 +51,6 @@ Users.init(
 );
 
 // the defined model is the class itself
-console.log(Users === sequelize.models.Users); // true
+console.log("Users:",Users === sequelize.models.Users); // true
 
 module.exports = { Users, sequelize };

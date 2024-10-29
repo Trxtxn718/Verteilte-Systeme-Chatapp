@@ -47,6 +47,6 @@ Messages.init(
     },
 );
 
-console.log(Messages === sequelize.models.Messages); // true
+console.log("Messages",Messages === sequelize.models.Messages); // true
 
 module.exports = { Messages, sequelize };

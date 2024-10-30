@@ -8,6 +8,8 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "crypto-js": "^4.2.0",
     "express": "^4.21",
     "jsonwebtoken": "^9.0.2",
     "mariadb": "^3.3.2",

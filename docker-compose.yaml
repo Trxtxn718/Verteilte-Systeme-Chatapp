@@ -10,6 +10,8 @@ services:
       MYSQL_USER: exampleuser
       MYSQL_PASSWORD: examplepass
       MYSQL_HOSTNAME: meinecooledb
+      JWT_SECRET: mysecret123
+      PASSWORD_SALT: mypasswordsalt
     links:
       - meinecooledb
     depends_on:

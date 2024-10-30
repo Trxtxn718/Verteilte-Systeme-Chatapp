@@ -2,6 +2,7 @@
 
 const express = require('express');
 const { Sequelize} = require('sequelize');
+const cookieParser = require('cookie-parser');
 
 // Import the models
 const { Users } = require('./models/Users');
@@ -17,6 +18,7 @@ const HOST = '0.0.0.0';
 
 // App
 const app = express();
+app.use(cookieParser());
 
 // Database connection
 

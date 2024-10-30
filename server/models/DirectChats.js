@@ -23,7 +23,7 @@ DirectChats.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: Users,
+                model: 'Users',
                 key: 'id'
             }
 
@@ -32,7 +32,7 @@ DirectChats.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: Users,
+                model: 'Users',
                 key: 'id'
             }
         },

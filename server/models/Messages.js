@@ -24,7 +24,7 @@ Messages.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: Users,
+                model: 'Users',
                 key: 'id'
             }
 
@@ -33,7 +33,7 @@ Messages.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: DirectChats,
+                model: 'DirectChats',
                 key: 'id'
             }
         },

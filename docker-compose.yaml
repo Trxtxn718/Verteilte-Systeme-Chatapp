@@ -6,9 +6,9 @@ services:
       - "8080:8080"
     restart: always
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
+      MYSQL_DATABASE: mariadb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpass
       MYSQL_HOSTNAME: mariadb
       JWT_SECRET: mysecret123
       PASSWORD_SALT: mypasswordsalt
@@ -20,10 +20,10 @@ services:
     build: db
     restart: always
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      MARIADB_DATABASE: mariadb
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD: rootpass
+      
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always

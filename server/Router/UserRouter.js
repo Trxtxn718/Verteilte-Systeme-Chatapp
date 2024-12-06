@@ -74,6 +74,7 @@ router.post('/register', async (req, res) => {
 // Try to login user with email and password
 router.post('/login', (req, res) => {
     // Check if user data is complete
+    console.log(req);
     if (req.body.email == null || req.body.password == null) {
         res.status(400).json({
             message: "User data not complete."

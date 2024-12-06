@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'variables';
+
+body{
+    font-family: $font-family;
+    font-size: $font-size;
+    background-color: $background-color;
+    color: $font-color;
+}
+
+.btn-primary{
+    padding: 0.5em 1em;
+    font-size: 1em;
+    background-color: $primary-color; 
+    color: #ffffff;
+    border: none;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
+a:link{
+    color: $primary-color;
+    text-decoration: none;
+}
+
+a:visited{
+    color: $tertiary-color;
+    text-decoration: none;
+}

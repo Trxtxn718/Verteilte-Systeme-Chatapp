@@ -29,9 +29,17 @@ router.get('/:id', (req, res) => {
 // Try to create new user with attributes
 router.post('/register', async (req, res) => {
     // Check if user data is complete
-    if (req.body.email == null || req.body.password == null || req.body.username == null) {
+    if (req.body.email == null || req.body.password == null || req.body.username == null || req.body.passwordRepeat == null) {
         res.status(400).json({
             message: "User data not complete."
+        });
+        return;
+    }
+
+    // Check if passwords match
+    if (req.body.password != req.body.passwordRepeat) {
+        res.status(400).json({
+            message: "Passwords do not match."
         });
         return;
     }
@@ -74,7 +82,6 @@ router.post('/register', async (req, res) => {
 // Try to login user with email and password
 router.post('/login', (req, res) => {
     // Check if user data is complete
-    console.log(req);
     if (req.body.email == null || req.body.password == null) {
         res.status(400).json({
             message: "User data not complete."

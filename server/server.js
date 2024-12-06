@@ -41,17 +41,17 @@ sequelize.authenticate()
         console.error('Unable to connect to the database:', err);
     });
 
-Users.sync({force:true}).then(result =>{
-    console.log("Created users table")
-})
+// Users.sync({force:true}).then(result =>{
+//     console.log("Created users table")
+// })
 
-Messages.sync({force:true}).then(result =>{
-    console.log("Created messages table")
-})
+// Messages.sync({force:true}).then(result =>{
+//     console.log("Created messages table")
+// })
 
-DirectChats.sync({force:true}).then(result =>{
-    console.log("Created DirectChats table")
-})
+// DirectChats.sync({force:true}).then(result =>{
+//     console.log("Created DirectChats table")
+// })
 
 
 

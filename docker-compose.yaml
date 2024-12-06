@@ -2,8 +2,10 @@ version: '3.3'
 services:
   server:
     build: server
-    ports:
-      - "8080:8080"
+    deploy:
+      replicas: 3
+      mode: replicated
+      endpoint_mode: vip
     restart: always
     environment:
       MYSQL_DATABASE: mariadb
@@ -16,6 +18,9 @@ services:
       - mariadb
     depends_on:
       - mariadb
+    networks:
+      - loadbalancing
+
   mariadb:
     build: db
     restart: always
@@ -23,7 +28,18 @@ services:
       MARIADB_DATABASE: mariadb
       MARIADB_USER: root
       MARIADB_ROOT_PASSWORD: rootpass
-      
+    networks:
+      - loadbalancing
+
+  nginx:
+    build: nginx-load-balancer
+    ports:
+      - "80:80"
+    networks:
+      - loadbalancing
+    depends_on:
+      - server
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always
@@ -31,3 +47,7 @@ services:
       - 8085:80
     environment:
       PMA_HOST: mariadb
+
+networks:
+  loadbalancing:
+    

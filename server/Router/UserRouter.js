@@ -68,11 +68,9 @@ router.post('/register', async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            maxAge: 1000 * 60 * 60 * 24 * 7
+            maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
         });
-        res.status(201).json({
-            message: "User created."
-        });
+        res.status(301).redirect('http://localhost:4200'); // Redirect to home
     }).catch(err => {
         console.error(err);
         res.status(500).json(err);
@@ -109,11 +107,9 @@ router.post('/login', (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            maxAge: 1000 * 60 * 60 * 24 * 7
+            maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
         });
-        res.status(200).json({
-            message: "User logged in."
-        });
+        res.status(301).redirect('http://localhost:4200'); // Redirect to home
     }).catch(err => {
         console.error(err);
         res.status(500).json(err);

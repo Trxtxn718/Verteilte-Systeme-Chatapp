@@ -1,29 +1,37 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'variables';
 
-body{
+body {
     font-family: $font-family;
     font-size: $font-size;
     background-color: $background-color;
     color: $font-color;
 }
 
-.btn-primary{
+.btn-primary,
+.btn-primary:visited {
     padding: 0.5em 1em;
     font-size: 1em;
-    background-color: $primary-color; 
+    background-color: $primary-color;
     color: #ffffff;
+    text-decoration: none;
     border: none;
     border-radius: 0.25em;
     cursor: pointer;
 }
 
-a:link{
+a:link {
     color: $primary-color;
     text-decoration: none;
 }
 
-a:visited{
+a:visited {
     color: $tertiary-color;
     text-decoration: none;
+}
+
+.horizontal-split {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

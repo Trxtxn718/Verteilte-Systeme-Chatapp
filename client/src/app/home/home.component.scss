@@ -9,9 +9,16 @@
 
 #home-card {
     max-width: 80vw;
+    max-height: 80vh;
+    width: 80vw;
+    height: 80vh;
 
     h1 {
         text-align: center;
         margin-bottom: 1em;
+    }
+
+    .horizontal-split > .left {
+        margin-right: 1em;
     }
 }

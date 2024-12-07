@@ -1,9 +1,20 @@
+@import "../../variables";
+
 .chat-list-item{
+    background-color: $background-color-light;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+
+    .left{
+        display: flex;
+        align-items: center;
+        padding: 0.5em;
+    }
+
     img{
         width: 3em;
         height: 3em;
         border-radius: 50%;
-        margin-right: 10px;
         overflow: hidden;
     }
 

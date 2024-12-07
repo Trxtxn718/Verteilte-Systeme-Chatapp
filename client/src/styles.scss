@@ -32,6 +32,20 @@ a:visited {
 
 .horizontal-split {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+
+    .left {
+       height: 100%;
+    }
+
+    .right {
+        height: 100%;
+        flex: 1
+    }
+}
+
+.bordered {
+    border: 1px solid #ccc;
+    border-radius: 0.5em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }

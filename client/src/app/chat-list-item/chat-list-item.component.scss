@@ -1,7 +1,10 @@
 @import "../../variables";
 
 .chat-list-item{
-    background-color: $background-color-light;
+    &.selected{
+        background-color: $background-color-light;
+    }
+
     margin-bottom: 0.5em;
     cursor: pointer;
 
@@ -20,5 +23,15 @@
 
     h3{
         margin: 0;
+    }
+
+    .content{
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .top >div{
+        color: $font-secondary-color;
     }
 }

@@ -1,0 +1,29 @@
+@import "../../variables";
+
+.chat-message {
+    margin: 1em;
+
+    img {
+        width: 2em;
+        height: 2em;
+        border-radius: 50%;
+    }
+
+    .right {
+        margin-left: 1em;
+        .username{
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        .time {
+            font-size: 0.8em;
+            color: $font-secondary-color;
+        }
+        
+        .text {
+            padding: 0.5em;
+            border-radius: 0.5em;
+            background-color: $background-color-light;
+        }
+    }
+}

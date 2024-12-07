@@ -1,29 +1,28 @@
+import { NgClass } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-chat-list-item',
   standalone: true,
-  imports: [],
+  imports: [NgClass],
   templateUrl: './chat-list-item.component.html',
   styleUrl: './chat-list-item.component.scss'
 })
 export class ChatListItemComponent {
-  @Input() name?: string;
-  @Input() lastMessage?: string;
-  @Input() lastMessageTime?: string;
+  @Input() user?: any;
+  @Input() lastMessage?: any;
+  @Input() selected?: string;
 
   constructor() {
-    if (!this.name) {
-      this.name = '';
+    if (!this.user) {
+      this.user = {username: 'Anonymous', avatar: 'https://www.gravatar.com/avatar/'};
     }
     if (!this.lastMessage) {
-      this.lastMessage = '';
+      this.lastMessage = {time: new Date().toLocaleString(), message: 'Placeholder message'};
     }
-    if (!this.lastMessageTime) {
-      this.lastMessageTime = '0.0.0, 00:00';
+    if (!this.selected || this.selected !== 'true') {
+      this.selected = 'false';
     }
-
-    console.log('ChatListItemComponent created');
   }
 
   clicked() {

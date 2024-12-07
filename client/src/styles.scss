@@ -40,7 +40,8 @@ a:visited {
 
     .right {
         height: 100%;
-        flex: 1
+        flex: 1;
+        min-width: 0;
     }
 }
 

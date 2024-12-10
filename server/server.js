@@ -2,6 +2,7 @@
 
 const express = require('express');
 const { Sequelize} = require('sequelize');
+const cookieParser = require('cookie-parser');
 
 // Import the models
 const { Users } = require('./models/Users');
@@ -17,6 +18,7 @@ const HOST = '0.0.0.0';
 
 // App
 const app = express();
+app.use(cookieParser());
 
 // Database connection
 
@@ -38,18 +40,6 @@ sequelize.authenticate()
     .catch(err => {
         console.error('Unable to connect to the database:', err);
     });
-
-Users.sync({force:true}).then(result =>{
-    console.log("Created users table")
-})
-
-Messages.sync({force:true}).then(result =>{
-    console.log("Created messages table")
-})
-
-DirectChats.sync({force:true}).then(result =>{
-    console.log("Created DirectChats table")
-})
 
 
 

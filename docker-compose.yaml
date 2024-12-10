@@ -2,18 +2,22 @@ version: '3.3'
 services:
   server:
     build: server
-    ports:
-      - "8080:8080"
+    deploy:
+      replicas: 3
+      mode: replicated
+      endpoint_mode: vip
     restart: always
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
-      MYSQL_HOSTNAME: meinecooledb
+      MYSQL_DATABASE: mariadb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpass
+      MYSQL_HOSTNAME: mariadb
+      JWT_SECRET: mysecret123
+      PASSWORD_SALT: mypasswordsalt
     links:
-      - meinecooledb
+      - mariadb
     depends_on:
-      - meinecooledb
+      - mariadb
   message-service:
     build: message-service
     ports:
@@ -25,20 +29,36 @@ services:
       - server
     depends_on:
       - server
-  meinecooledb:
-    # Use of a modified datbase in 'db'-folder.
-    # See README.md for more information.
+    networks:
+      - loadbalancing
+
+  mariadb:
     build: db
     restart: always
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      MARIADB_DATABASE: mariadb
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD: rootpass
+    networks:
+      - loadbalancing
+
+  nginx:
+    build: nginx-load-balancer
+    ports:
+      - "80:80"
+    networks:
+      - loadbalancing
+    depends_on:
+      - server
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
       - 8085:80
     environment:
-      PMA_HOST: meinecooledb
+      PMA_HOST: mariadb
+
+networks:
+  loadbalancing:
+    

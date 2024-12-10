@@ -1,1 +1,16 @@
 */node_modules
+*/dist
+*/.vscode
+*/.idea
+*/.DS_Store
+*/.env
+*/.env.local
+*/.env.development
+*/.env.test
+*/.env.production
+*/.cache
+*/.history
+*/.sourcemaps
+*/.vs
+*/.nyc_output
+*/.coverage

@@ -1,0 +1,38 @@
+@import '../../variables';
+
+#profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#profile-card h1 {
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+#profile-form {
+    padding: 1em;
+    margin: 1em;
+    background-color: $background-color-light;
+
+    .form-group {
+        margin-bottom: 1em;
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 0.5em;
+            font-size: 1em;
+            width: 20em;
+            border: 1px solid #ccc;
+            border-radius: 0.25em;
+        }
+    }
+
+    .right {
+        display: flex;
+        justify-content: end;
+    }
+}

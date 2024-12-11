@@ -12,8 +12,8 @@ export class ProfileComponent {
     fetch('/api/profile')
       .then(response => response.json())
       .then(data => {
-        
-      });
+
+      }).catch(error => { console.log(error); });
 
     console.log('ProfileComponent initialized');
   }

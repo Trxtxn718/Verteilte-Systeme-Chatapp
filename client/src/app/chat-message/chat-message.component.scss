@@ -2,6 +2,8 @@
 
 .chat-message {
     margin: 1em;
+    display: flex;
+    max-width: 80%;
 
     img {
         width: 2em;
@@ -9,8 +11,7 @@
         border-radius: 50%;
     }
 
-    .right {
-        margin-left: 1em;
+    .content {
         .username{
             font-weight: bold;
             font-size: 0.8em;

@@ -20,6 +20,18 @@ body {
     cursor: pointer;
 }
 
+.btn-secondary,
+.btn-secondary:visited {
+    padding: 0.5em 1em;
+    font-size: 1em;
+    background-color: #00000000;
+    color: $primary-color;
+    text-decoration: none;
+    border: 2px solid $primary-color;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
 a:link {
     color: $primary-color;
     text-decoration: none;

@@ -15,7 +15,7 @@ export class ChatListItemComponent {
 
   constructor() {
     if (!this.user) {
-      this.user = {username: 'Anonymous', avatar: 'https://www.gravatar.com/avatar/'};
+      this.user = {username: 'Anonymous'};
     }
     if (!this.lastMessage) {
       this.lastMessage = {time: new Date().toLocaleString(), message: 'Placeholder message'};

@@ -64,7 +64,7 @@ router.post('/register', async (req, res) => {
     // Create user
     Users.create(req.body).then(user => {
         // Set cookie with token
-        res.cookie('token', jwt.sign({ id: user.id }, process.env.JWT_SECRET), {
+        res.cookie('token', jwt.sign({ id: user.id, username: user.username}, process.env.JWT_SECRET), {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
@@ -103,7 +103,7 @@ router.post('/login', (req, res) => {
             return;
         }
         // Set cookie with token
-        res.cookie('token', jwt.sign({ id: user.id }, process.env.JWT_SECRET), {
+        res.cookie('token', jwt.sign({ id: user.id, username: user.username}, process.env.JWT_SECRET), {
             httpOnly: true,
             secure: true,
             sameSite: 'none',

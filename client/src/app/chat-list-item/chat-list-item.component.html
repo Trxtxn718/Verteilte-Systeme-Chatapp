@@ -1,14 +1,9 @@
-<li class="chat-list-item horizontal-split bordered" [ngClass]="{'selected' : selected == 'true'}" (click)="clicked()">
-    <div class="left">
-        <img src="https://via.placeholder.com/50" alt="profile-pic"> <!--TODO: Replace with user profile picture -->
+<li class="chat-list-item bordered" [ngClass]="{'selected' : selected == 'true'}" (click)="clicked()">
+    <div class="top">
+        <h3>{{user.username}}</h3>
+        <div>{{lastMessage.time}}</div>
     </div>
-    <div class="right">
-        <div class="top">
-            <h3>{{user.username}}</h3>
-            <div>{{lastMessage.time}}</div>
-        </div>
-        <div class="content bottom">
-            {{lastMessage.message}}
-        </div>
+    <div class="content bottom">
+        {{lastMessage.message}}
     </div>
 </li>

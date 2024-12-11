@@ -2,10 +2,25 @@
     <div id="home-card">
         <div class="horizontal-split">
             <div class="left">
-                <app-chat-list></app-chat-list>
+                <div id="chat-list" class="">
+                    <ul>
+                        <app-chat-list-item selected="true"></app-chat-list-item>
+                        <app-chat-list-item></app-chat-list-item>
+                        <app-chat-list-item></app-chat-list-item>
+                    </ul>
+                </div>
             </div>
             <div class="right">
-                <app-chat></app-chat>
+                <div id="chat" class="bordered">
+                    <div id="chat-history">
+                        <app-chat-message></app-chat-message>
+                        <app-chat-message></app-chat-message>
+                    </div>
+                    <div id="chat-input">
+                        <textarea id="chat-bar" placeholder="Type a message..." oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
+                        <button id="chat-send" class="btn btn-primary" (click)="sendMessage()">Send</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -13,7 +13,7 @@ const { DirectChats } = require('./models/DirectChats');
 const UserRouter = require('./Router/UserRouter');
 
 // Constants
-const PORT = process.env.PORT || 8080;
+const PORT = 3000;
 const HOST = '0.0.0.0';
 
 // App

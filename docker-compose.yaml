@@ -2,10 +2,10 @@ version: '3.3'
 services:
   backend:
     build: server
-    deploy:
-      replicas: 3
-      mode: replicated
-      endpoint_mode: vip
+    # deploy:
+    #   replicas: 1
+    #   mode: replicated
+    #   endpoint_mode: vip
     restart: always
     environment:
       MYSQL_DATABASE: mariadb
@@ -21,6 +21,9 @@ services:
         condition: service_healthy
     networks:
       - loadbalancing
+    ports:
+      - "3000:3000"
+
   message-service:
     build: message-service
     deploy:

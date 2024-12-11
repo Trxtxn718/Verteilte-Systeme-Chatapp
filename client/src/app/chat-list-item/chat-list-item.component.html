@@ -1,4 +1,4 @@
-<li class="chat-list-item bordered" [ngClass]="{'selected' : selected == 'true'}" (click)="clicked()">
+<li class="chat-list-item bordered" [ngClass]="{'selected' : active}" (click)="clicked()">
     <div class="top">
         <h3>{{user.username}}</h3>
         <div>{{lastMessage.time}}</div>

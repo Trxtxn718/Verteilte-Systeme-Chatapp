@@ -2,13 +2,12 @@
     <div id="home-card">
         <div class="horizontal-split">
             <div class="left">
-                <div id="chat-list" class="">
-                    <ul>
-                        <app-chat-list-item selected="true"></app-chat-list-item>
-                        <app-chat-list-item></app-chat-list-item>
-                        <app-chat-list-item></app-chat-list-item>
-                    </ul>
+                <div id="chat-manager">
+                    <button id="new-chat" class="btn btn-primary" (click)="addChild()">Neuer Chat</button>
                 </div>
+                <ul id="chat-list">
+                    <ng-template #viewContainerRef></ng-template>
+                </ul>
             </div>
             <div class="right">
                 <div id="chat" class="bordered">
@@ -17,7 +16,8 @@
                         <app-chat-message></app-chat-message>
                     </div>
                     <div id="chat-input">
-                        <textarea id="chat-bar" placeholder="Type a message..." oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
+                        <textarea id="chat-bar" placeholder="Type a message..."
+                            oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
                         <button id="chat-send" class="btn btn-primary" (click)="sendMessage()">Send</button>
                     </div>
                 </div>

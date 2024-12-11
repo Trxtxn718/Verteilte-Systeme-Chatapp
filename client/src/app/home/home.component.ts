@@ -13,6 +13,7 @@ import { SocketService } from '../socket.service';
 })
 export class HomeComponent {
   private socketSubscription: Subscription;
+  activeChat: any;
   messages: any[] = [];
   chatList: any[] = [];
   @ViewChild("viewContainerRef", { read: ViewContainerRef }) vcr!: ViewContainerRef;
@@ -20,16 +21,28 @@ export class HomeComponent {
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
-  addChild() {
+  addChild(data: any) {
     this.ref = this.vcr.createComponent(ChatListItemComponent);
-    this.ref.instance.updateStatus.subscribe((event: ChatListItemComponent) => {this.openChat(event);});
+    this.ref.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
+    this.ref.instance.chat = data;
     this.chatList.push(this.ref.instance);
   }
 
   constructor(private socketService: SocketService) {
-    this.socketSubscription = this.socketService.on('message').subscribe((message: any) => {
-      console.log('Message received:', message);
-      this.messages.push(message);
+    // get all chats
+    // this.addChild({ id: 1, name: 'Chat 1' });
+    fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
+      response.json().then((data) => {
+        console.log('Chats:', data);
+        data.forEach((chat: any) => {
+          // this.addChild(chat);
+        });
+      });
+    }).catch((error) => { console.error(error); });
+
+    this.socketSubscription = this.socketService.on('chat').subscribe((data: any) => {
+      console.log('Received chat:', data);
+      // this.addChild(data);
     });
   }
 
@@ -62,16 +75,69 @@ export class HomeComponent {
     this.socketService.emit('message', { message });
   }
 
-  openChat(event?: ChatListItemComponent) {
-    console.log('Opening chat', event);
+  openChat(openedChat?: ChatListItemComponent) {
+    this.socketSubscription.unsubscribe();
+    console.log('Opening chat', openedChat);
     this.chatList.forEach((chat: ChatListItemComponent) => {
-      if (chat !== event) {
+      if (chat !== openedChat) {
         chat.active = false;
       }
     });
+    this.activeChat = openedChat;
+
+    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+      console.log('Received message:', data);
+      this.messages.push(data);
+
+
+    });
+
+    const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
+    chatInfo.innerText = openedChat?.chat.name || 'Chat Name';
   }
 
   ngOnDestroy() {
     this.socketSubscription.unsubscribe();
+  }
+
+  createChat() {
+    console.log('Creating chat');
+    const input = document.getElementById('new-chat-input') as HTMLInputElement;
+    const chatName = input.value;
+    console.log('Chat name:', chatName);
+    input.value = '';
+
+    const popup = document.getElementById('new-chat-popup') as HTMLElement;
+    popup.style.display = 'none';
+
+    this.addChild({ name: chatName });
+  }
+
+  openPopup() {
+    const popup = document.getElementById('new-chat-popup') as HTMLElement;
+    popup.style.display = 'flex';
+  }
+
+  closePopup() {
+    const popup = document.getElementById('new-chat-popup') as HTMLElement;
+    popup.style.display = 'none';
+  }
+
+  leaveChat() {
+    console.log('Leaving chat');
+  }
+
+  getChatHistory() {
+    console.log('Getting chat history');
+    fetch('http://localhost:3000/chat?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
+      response.json().then((data) => {
+        console.log('Chat history:', data);
+        data.forEach((message: any) => {
+          this.messages.push(message);
+        });
+      });
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 }

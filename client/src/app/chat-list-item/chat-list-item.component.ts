@@ -9,6 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './chat-list-item.component.scss'
 })
 export class ChatListItemComponent {
+  chat: any;
   @Input() user?: any;
   @Input() lastMessage?: any;
   @Input() selected?: string;

@@ -18,9 +18,15 @@
         margin-bottom: 1em;
     }
 
-    .horizontal-split>.left {
+    .left {
         margin-right: 1em;
         max-height: 80vh;
+    }
+
+    > .right{
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
     }
 
     #chat-manager{
@@ -30,18 +36,31 @@
 
 #chat-list {
     overflow-y: auto;
-    height: 80vh;
+    flex: 1;
     width: 25vw;
     padding-left: 0px;
     margin-block: 0px;
 }
 
+#chat-info{
+    h2{
+        text-align: center;
+        margin-bottom: 1em;
+        margin-top: 0;
+    }
+    
+    .right{
+        display: flex;
+        justify-content: end;
+        align-items: start;
+    }
+}
+
 #chat {
     width: 100%;
-    height: 80vh;
-
     display: flex;
     flex-direction: column;
+    flex: 1;
 
     #chat-history {
         flex: 1;
@@ -69,6 +88,58 @@
             height: 1.2em;
             max-height: 5em;
             font-family: $font-family;
+        }
+    }
+}
+
+#new-chat-popup{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    #new-chat-card{
+        width: 40vw;
+        background-color: $background-color-light;
+        border-radius: 0.5em;
+        padding: 1em;
+
+        h2{
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        #input-div{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1em;
+        }
+        #new-chat-input{
+            flex: 1;
+            padding: 0.5em;
+            border: none;
+            border-radius: 0.5em;
+            background-color: $background-color;
+            color: $font-color;
+            font-size: 1em;
+            font-family: $font-family;
+        }
+
+        .horizontal-split{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .right{
+            margin-left: 1em;
+            flex: 0 1 auto;
         }
     }
 }

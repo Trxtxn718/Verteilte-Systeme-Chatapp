@@ -31,6 +31,12 @@
 
     #chat-manager{
         margin-bottom: 0.55em;
+
+        .right{
+            display: flex;
+            justify-content: end;
+            align-items: start;
+        }
     }
 }
 
@@ -45,7 +51,7 @@
 #chat-info{
     h2{
         text-align: center;
-        margin-bottom: 1em;
+        margin-bottom: 0.25em;
         margin-top: 0;
     }
     
@@ -53,6 +59,7 @@
         display: flex;
         justify-content: end;
         align-items: start;
+        padding: 0.25em;
     }
 }
 

@@ -16,29 +16,38 @@ export class HomeComponent {
   activeChat: any;
   messages: any[] = [];
   chatList: any[] = [];
-  @ViewChild("viewContainerRef", { read: ViewContainerRef }) vcr!: ViewContainerRef;
-  ref!: ComponentRef<ChatListItemComponent>;
+  messagesList: any[] = [];
+  @ViewChild("chatInsertPoint", { read: ViewContainerRef }) cip!: ViewContainerRef;
+  @ViewChild("messageInsertPoint", { read: ViewContainerRef }) mip!: ViewContainerRef;
+  cipRef!: ComponentRef<ChatListItemComponent>;
+  mipRef!: ComponentRef<ChatMessageComponent>;
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
-  addChild(data: any) {
-    this.ref = this.vcr.createComponent(ChatListItemComponent);
-    this.ref.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
-    this.ref.instance.chat = data;
-    this.chatList.push(this.ref.instance);
+  addChatComponent(data: any) {
+    this.cipRef = this.cip.createComponent(ChatListItemComponent);
+    this.cipRef.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
+    this.cipRef.instance.chat = data;
+    this.chatList.push(this.cipRef.instance);
+  }
+
+  addMessage(data: any) {
+    this.mipRef = this.mip.createComponent(ChatMessageComponent);
+    this.mipRef.instance.message = data;
+    this.messagesList.push(this.cipRef.instance);
   }
 
   constructor(private socketService: SocketService) {
     // get all chats
     // this.addChild({ id: 1, name: 'Chat 1' });
-    fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
-      response.json().then((data) => {
-        console.log('Chats:', data);
-        data.forEach((chat: any) => {
-          // this.addChild(chat);
-        });
-      });
-    }).catch((error) => { console.error(error); });
+    // fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
+    //   response.json().then((data) => {
+    //     console.log('Chats:', data);
+    //     data.forEach((chat: any) => {
+    //       // this.addChild(chat);
+    //     });
+    //   });
+    // }).catch((error) => { console.error(error); });
 
     this.socketSubscription = this.socketService.on('chat').subscribe((data: any) => {
       console.log('Received chat:', data);
@@ -63,6 +72,10 @@ export class HomeComponent {
         console.log(this.chatList);
       });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      this.createChat();
+    });
   }
 
   sendMessage() {
@@ -88,12 +101,10 @@ export class HomeComponent {
     this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
       console.log('Received message:', data);
       this.messages.push(data);
-
-
     });
 
     const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
-    chatInfo.innerText = openedChat?.chat.name || 'Chat Name';
+    chatInfo.innerText = openedChat?.chat.name || ' ';
   }
 
   ngOnDestroy() {
@@ -110,7 +121,7 @@ export class HomeComponent {
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'none';
 
-    this.addChild({ name: chatName });
+    this.addChatComponent({ name: chatName });
   }
 
   openPopup() {
@@ -125,11 +136,19 @@ export class HomeComponent {
 
   leaveChat() {
     console.log('Leaving chat');
+    fetch('http://localhost:3000/leave?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString(), {
+      method: 'POST'
+    }).then((response) => {
+      console.log('Left chat:', response);
+      window.location.reload();
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   getChatHistory() {
     console.log('Getting chat history');
-    fetch('http://localhost:3000/chat?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
+    fetch('http://localhost:3000/messages?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
       response.json().then((data) => {
         console.log('Chat history:', data);
         data.forEach((message: any) => {

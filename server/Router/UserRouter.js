@@ -116,6 +116,75 @@ router.post('/login', (req, res) => {
     });
 });
 
+// Try to update user with id and attributes
+router.put('/:id', (req, res) => {
+
+    // Check if user data is complete
+    if (req.body.password == null) {
+        res.status(400).json({
+            message: "User data not complete."
+        });
+        return;
+    }
+
+    if ((req.body.newPassword != null && req.body.newPasswordRepeat != req.body.newPassword) || (req.body.newPasswordRepeat != null && req.body.newPassword != req.body.newPasswordRepeat)) {
+        res.status(400).json({
+            message: "Passwords do not match."
+        });
+        return;
+    }
+
+    // Check if user exists
+    Users.findByPk(req.params.id).then(user => {
+        if (user == null) {
+            res.status(404).json({
+                message: "User not found."
+            });
+            return;
+        }
+        // Check if password is correct
+        if (user.password != crypto.pbkdf2Sync(req.body.password, process.env.PASSWORD_SALT, 1000, 64, 'sha512').toString('hex')) {
+            res.status(401).json({
+                message: "Password incorrect."
+            });
+            return;
+        }
+        // Check if new username is unique
+        if (req.body.username != null) {
+            Users.findOne({ where: { username: req.body.username } }).then(user => {
+                if (user != null) {
+                    res.status(409).json({
+                        message: "Username already exists."
+                    });
+                    return;
+                }
+            }).catch(err => {
+                console.error(err);
+                res.status(500).json(err);
+            });
+        }
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+    });
+
+    // Update user
+    req.body.updated = new Date().toISOString();
+    if (req.body.newPassword != null) {
+        req.body.password = crypto.pbkdf2Sync(req.body.newPassword, process.env.PASSWORD_SALT, 1000, 64, 'sha512').toString('hex');
+    }
+    Users.update(req.body, {
+        where: {
+            id: req.params.id
+        }
+    }).then(() => {
+        res.status(204).send();
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+    });
+});
+
 // Try to delete user with id
 router.delete('/:id', (req, res) => {
     Users.destroy({

@@ -1,11 +1,48 @@
 <div id="home">
-    <div id="home-card">
-        <div class="horizontal-split">
-            <div class="left">
-                <app-chat-list></app-chat-list>
+    <div id="home-card" class="horizontal-split">
+        <div class="left">
+            <div id="chat-manager">
+                <button id="new-chat" class="btn btn-primary" (click)="openPopup()">Neuer Chat</button>
             </div>
-            <div class="right">
-                <app-chat></app-chat>
+            <ul id="chat-list">
+                <ng-template #viewContainerRef></ng-template>
+            </ul>
+        </div>
+        <div class="right">
+            <div id="chat-info" class="horizontal-split">
+                <div class="left">
+                    <h2 id="chat-info-name">Chatname</h2>
+                </div>
+                <div class="right">
+                    <button id="leave-chat" class="btn btn-secondary" (click)="leaveChat()">Verlassen</button>
+                </div>
+            </div>
+            <div id="chat" class="bordered">
+                <div id="chat-history">
+                    <app-chat-message></app-chat-message>
+                    <app-chat-message></app-chat-message>
+                </div>
+                <div id="chat-input">
+                    <textarea id="chat-bar" placeholder="Type a message..."
+                        oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
+                    <button id="chat-send" class="btn btn-primary" (click)="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="new-chat-popup">
+        <div id="new-chat-card">
+            <h2>Neuer Chat</h2>
+            <div id="input-div">
+                <input type="text" id="new-chat-input" placeholder="Username">
+            </div>
+            <div class="horizontal-split">
+                <div class="left">
+                    <button id="new-chat-create" class="btn btn-primary" (click)="createChat()">Erstellen</button>
+                </div>
+                <div class="right">
+                    <button id="new-chat-cancel" class="btn btn-secondary" (click)="closePopup()">Abbrechen</button>
+                </div>
             </div>
         </div>
     </div>

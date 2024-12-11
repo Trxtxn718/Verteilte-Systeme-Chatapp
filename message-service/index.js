@@ -20,11 +20,6 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg);
   });
 });
-    console.log(socket)  
-    socket.on('chat message', (msg) => {
-      console.log('message: ' + msg);
-    });
-  });
 
 server.listen(PORT, '0.0.0.0');
 console.log(`Running on http://${HOST}:${PORT}`);

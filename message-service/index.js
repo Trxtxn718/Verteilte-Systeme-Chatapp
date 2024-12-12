@@ -13,6 +13,8 @@ const io = new Server(server);
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '127.0.0.1'
 
+const users = {};
+
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'))
 })
@@ -21,16 +23,17 @@ io.adapter(mqttAdapter(
   {
     host: 'mqtt://mqtt',
     port: 1883
-    }
+  }
 ));
 
 
 io.on('connection', (socket) => {
-  console.log(socket);
-  socket.on('chat message', (msg) => {
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);
-    mqttClient.publish('test/topic', msg);
+  console.log('user connected');
+
+  socket.on('register', (userId) => {
+    console.log(`User ${userId} registered`);
+    users[userId] = socket.id;
+    console.log(users);
   });
 });
 

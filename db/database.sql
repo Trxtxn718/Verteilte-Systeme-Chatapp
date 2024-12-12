@@ -14,16 +14,16 @@ CREATE TABLE
     `updated` DATETIME NOT NULL
   );
 
--- CREATE TABLE
---   `DirectChats` (
---     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
---     `user_1` BIGINT NOT NULL,
---     `user_2` BIGINT NOT NULL
---   );
+CREATE TABLE
+  `DirectChats` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_1` BIGINT NOT NULL,
+    `user_2` BIGINT NOT NULL
+  );
 
--- ALTER TABLE `DirectChats` ADD INDEX `directchats_user_1_index` (`user_1`);
+ALTER TABLE `DirectChats` ADD INDEX `directchats_user_1_index` (`user_1`);
 
--- ALTER TABLE `DirectChats` ADD INDEX `directchats_user_2_index` (`user_2`);
+ALTER TABLE `DirectChats` ADD INDEX `directchats_user_2_index` (`user_2`);
 
 -- CREATE TABLE
 --   `Messages` (

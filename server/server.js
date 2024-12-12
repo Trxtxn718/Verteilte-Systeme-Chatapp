@@ -11,7 +11,7 @@ const { DirectChats } = require('./models/DirectChats');
 
 // Import the routers
 const UserRouter = require('./Router/UserRouter');
-
+const ChatRouter = require('./Router/ChatRouter');
 // Constants
 const PORT = process.env.PORT || 8080;
 const HOST = '0.0.0.0';
@@ -55,6 +55,7 @@ console.log(`Running on http://${HOST}:${PORT}`);
 
 // Routes
 app.use('/users', UserRouter);
+app.use('/chats', ChatRouter);
 
 // Start database connection
 const sleep = (milliseconds) => {

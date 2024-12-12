@@ -27,16 +27,18 @@ export class HomeComponent {
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
-  addChatComponent(data: any) {
+  addChatComponent(chat: any, message: any) {
     this.cipRef = this.cip.createComponent(ChatListItemComponent);
     this.cipRef.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
-    this.cipRef.instance.chat = data;
+    this.cipRef.instance.chat = chat;
+    this.cipRef.instance.lastMessage = message;
     this.chatList.push(this.cipRef.instance);
   }
 
   addOldMessage(data: any) {
     this.oipRef = this.oip.createComponent(ChatMessageComponent);
     this.oipRef.instance.message = data;
+
     this.oldMessagesList.push(this.cipRef.instance);
   }
 
@@ -141,7 +143,7 @@ export class HomeComponent {
     });
 
     const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
-    chatInfo.innerText = openedChat?.chat.name || ' ';
+    chatInfo.innerText = openedChat?.chat.username || ' ';
 
     const chatHistory = this.getChatHistory();
 
@@ -170,7 +172,7 @@ export class HomeComponent {
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'none';
 
-    this.addChatComponent({ name: chatName });
+    this.addChatComponent({ id: 1 , username: chatName}, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
   }
 
   openPopup() {
@@ -198,22 +200,16 @@ export class HomeComponent {
   getChatHistory(start: number = 0, end: number = 10, chatId: number = this.activeChat?.chat.id) {
     console.log('Getting chat history');
     const messages = [
-      { message: 'Hello', time: new Date().toLocaleString() },
-      { message: 'How are you?', time: new Date().toLocaleString() },
-      { message: 'I am fine', time: new Date().toLocaleString() },
-      { message: 'Thank you', time: new Date().toLocaleString() },
-      { message: 'Goodbye', time: new Date().toLocaleString() },
+      { message: '1', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '2', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '3', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '4', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '5', time: new Date().toLocaleString(), username: 'User1' },
 
-      { message: 'Hello', time: new Date().toLocaleString() },
-      { message: 'How are you?', time: new Date().toLocaleString() },
-      { message: 'I am fine', time: new Date().toLocaleString() },
-      { message: 'Thank you', time: new Date().toLocaleString() },
-      { message: 'Goodbye', time: new Date().toLocaleString() },
-      { message: 'Hello', time: new Date().toLocaleString() },
-      { message: 'How are you?', time: new Date().toLocaleString() },
-      { message: 'I am fine', time: new Date().toLocaleString() },
-      { message: 'Thank you', time: new Date().toLocaleString() },
-      { message: 'Goodbye', time: new Date().toLocaleString() }
+      { message: '6', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '7', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '8', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '9', time: new Date().toLocaleString(), username: 'User1' },
     ];
 
     return messages.reverse();

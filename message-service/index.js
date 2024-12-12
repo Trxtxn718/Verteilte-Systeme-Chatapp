@@ -67,8 +67,12 @@ mqttClient.on('connect', () => {
 
 mqttClient.on('message', (topic, message) => {
   console.log(`MQTT Message received:${message.toString()}`);
-  if (users[formatedMessage.receiver_id] != null) {
-    io.to(users[formatedMessage.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+  const messageObj = JSON.parse(message);
+  if (users[messageObj.receiver_id] != null) {
+    io.to(users[messageObj.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+  }
+  else {
+    console.log(`User ${messageObj.receiver_id} not online`);
   }
 });
 

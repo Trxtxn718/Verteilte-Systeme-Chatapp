@@ -13,7 +13,7 @@ import { SocketService } from '../socket.service';
 })
 export class HomeComponent {
   private socketSubscription: Subscription;
-  activeChat: any;
+  activeChat?: ChatListItemComponent;
   messages: any[] = [];
   chatList: any[] = [];
   oldMessagesList: any[] = [];
@@ -85,12 +85,6 @@ export class HomeComponent {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      this.createChat();
-
-      this.getChatHistory().forEach((message: any) => {
-        this.addOldMessage(message);
-      });
-
       const chatHistory = document.getElementById('chat-history') as HTMLElement;
       chatHistory.scrollTop = chatHistory.scrollHeight;
     });
@@ -114,17 +108,43 @@ export class HomeComponent {
 
   sendMessage() {
     const chatBar = document.getElementById('chat-bar') as HTMLInputElement;
-    const message = chatBar.value;
-    chatBar.value = '';
-    chatBar.style.height = "1.2em";
-    console.log('Sending message:', message);
+    if (!this.activeChat || chatBar.value === '') {
+      chatBar.value = '';
+      chatBar.style.height = "1.2em";
+    } else {
+      const user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
+      const message = { message: chatBar.value, time: new Date().toLocaleString(), user_id: user.id, chat_id: this.activeChat?.chat.id, username: user.username };
+      chatBar.value = '';
+      chatBar.style.height = "1.2em";
 
-    this.addNewMessage({ message, time: new Date().toLocaleString() });
 
-    this.socketService.emit('message', { message });
+      console.log('Sending message:', message);
 
-    const chatHistory = document.getElementById('chat-history') as HTMLElement;
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      this.addNewMessage(message);
+
+      this.socketService.emit('message', { message });
+
+      const chatHistory = document.getElementById('chat-history') as HTMLElement;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      this.activeChat.lastMessage = message;
+      this.refreshChatListItem(this.activeChat);
+    }
+  }
+
+  refreshChatListItem(chat: ChatListItemComponent) {
+    console.log(this.chatList);
+    console.log(document.getElementById('chat-list')?.childNodes);
+    const index = this.chatList.indexOf(chat);
+    if (index != this.chatList.length - 1) {
+      this.chatList.splice(index, 1);
+      this.chatList.push(this.activeChat);
+      const chatList = document.getElementById('chat-list') as HTMLElement;
+      const chatDom = chatList.childNodes[index]
+      chatList.removeChild(chatDom);
+      chatList.appendChild(chatDom);
+    }
   }
 
   openChat(openedChat?: ChatListItemComponent) {
@@ -172,7 +192,7 @@ export class HomeComponent {
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'none';
 
-    this.addChatComponent({ id: 1 , username: chatName}, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
+    this.addChatComponent({ id: 1, username: chatName }, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
   }
 
   openPopup() {
@@ -213,15 +233,15 @@ export class HomeComponent {
     ];
 
     return messages.reverse();
-    fetch('http://localhost:3000/messages?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
-      response.json().then((data) => {
-        console.log('Chat history:', data);
-        data.forEach((message: any) => {
-          this.messages.push(message);
-        });
-      });
-    }).catch((error) => {
-      console.error(error);
-    });
+    // fetch('http://localhost:3000/messages?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
+    //   response.json().then((data) => {
+    //     console.log('Chat history:', data);
+    //     data.forEach((message: any) => {
+    //       this.messages.push(message);
+    //     });
+    //   });
+    // }).catch((error) => {
+    //   console.error(error);
+    // });
   }
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment';
+import { SocketService } from '../socket.service';
 
 @Component({
   selector: 'app-register',
@@ -10,7 +11,7 @@ import { environment } from '../../../environment';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private socket: SocketService) { }
 
   sendForm() {
     const username = document.getElementById('username') as HTMLInputElement;
@@ -28,6 +29,7 @@ export class RegisterComponent {
         console.log(response);
         if (response && response.status === 201) {
           localStorage.setItem('user', JSON.stringify(response.body));
+          // this.socket.emit('register', response.body.id);
           window.location.href = '/';
         } else {
           alert('Nutzername bzw. Email bereits vergeben oder Passwörter stimmen nicht überein');

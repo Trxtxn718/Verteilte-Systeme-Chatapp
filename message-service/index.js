@@ -7,9 +7,16 @@ const mqtt = require("mqtt");
 const { formatMessage } = require("./message.service");
 
 
+
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ['Content-Type, Authorization, Content-Length, X-Requested-With'],
+  },
+});
 
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '127.0.0.1'
@@ -27,7 +34,6 @@ io.adapter(mqttAdapter(
   }
 ));
 
-
 io.on('connection', (socket) => {
   console.log('user connected');
 
@@ -39,10 +45,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', async (msg) => {
+    console.log('MSG:')
+    console.log(msg);
+    console.log('MSG END')
     msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);
     const formatedMessage = await formatMessage(msgObj);
-    console.log(formatedMessage);
+    console.log('Formated Message' + formatedMessage);
     if (users[formatedMessage.receiver_id] != null) {
       io.to(users[formatedMessage.receiver_id]).emit('message', JSON.stringify(formatedMessage));
     }

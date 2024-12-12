@@ -1,0 +1,38 @@
+@import "../../variables";
+
+.chat-list-item{
+    &.selected{
+        background-color: $background-color-light;
+    }
+
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    cursor: pointer;
+
+    .left{
+        display: flex;
+        align-items: center;
+        padding: 0.5em;
+    }
+
+    img{
+        width: 3em;
+        height: 3em;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    h3{
+        margin: 0;
+    }
+
+    .content{
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .top >div{
+        color: $font-secondary-color;
+    }
+}

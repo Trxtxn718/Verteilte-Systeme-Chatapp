@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const express = require("express");
 const { createServer } = require("node:http");
 const { join } = require("node:path");
+const { cp } = require("node:fs");
 
 const app = express();
 const server = createServer(app);
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
 
 
 io.on('connection', (socket) => {
+  console.log('a user connected');
   socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
   });

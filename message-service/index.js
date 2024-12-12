@@ -38,11 +38,17 @@ io.on('connection', (socket) => {
     console.log(users);
   });
 
-  socket.on('message', (msg) => {
-    msgObj = JSON.parse(msg);
+  socket.on('message', (msg) => async () => {
+    msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);
-    formatMessage(msgObj);
-    
+    const formatedMessage = await formatMessage(msgObj);
+    console.log(formatedMessage); 
+    if(users[formatedMessage.receiver_id] != null) {
+      io.to(users[formatedMessage.receiver_id]).emit('message', JSON.stringify(formatedMessage));
+    }
+    else {
+      console.log(`User ${formatedMessage.receiver_id} not online`);
+    }
   });
 
   socket.on('disconnect', () => {

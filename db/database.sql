@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mariadb
--- Erstellungszeit: 12. Dez 2024 um 16:16
+-- Erstellungszeit: 12. Dez 2024 um 18:35
 -- Server-Version: 11.6.2-MariaDB-ubu2404
 -- PHP-Version: 8.2.8
 
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `DirectChats`
+-- Tabellenstruktur fÃ¼r Tabelle `DirectChats`
 --
 
 CREATE TABLE `DirectChats` (
@@ -34,7 +34,7 @@ CREATE TABLE `DirectChats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
--- Daten für Tabelle `DirectChats`
+-- Daten fÃ¼r Tabelle `DirectChats`
 --
 
 INSERT INTO `DirectChats` (`id`, `user_1`, `user_2`) VALUES
@@ -44,7 +44,7 @@ INSERT INTO `DirectChats` (`id`, `user_1`, `user_2`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `GroupChats`
+-- Tabellenstruktur fÃ¼r Tabelle `GroupChats`
 --
 
 CREATE TABLE `GroupChats` (
@@ -54,7 +54,20 @@ CREATE TABLE `GroupChats` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `Users`
+-- Tabellenstruktur fÃ¼r Tabelle `Messages`
+--
+
+CREATE TABLE `Messages` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `chat_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `content` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur fÃ¼r Tabelle `Users`
 --
 
 CREATE TABLE `Users` (
@@ -68,7 +81,7 @@ CREATE TABLE `Users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
--- Daten für Tabelle `Users`
+-- Daten fÃ¼r Tabelle `Users`
 --
 
 INSERT INTO `Users` (`id`, `email`, `username`, `password`, `profile_img`, `created`, `updated`) VALUES
@@ -79,7 +92,7 @@ INSERT INTO `Users` (`id`, `email`, `username`, `password`, `profile_img`, `crea
 --
 
 --
--- Indizes für die Tabelle `DirectChats`
+-- Indizes fÃ¼r die Tabelle `DirectChats`
 --
 ALTER TABLE `DirectChats`
   ADD PRIMARY KEY (`id`),
@@ -87,55 +100,53 @@ ALTER TABLE `DirectChats`
   ADD KEY `directchats_user_2_index` (`user_2`);
 
 --
--- Indizes für die Tabelle `GroupChats`
+-- Indizes fÃ¼r die Tabelle `GroupChats`
 --
 ALTER TABLE `GroupChats`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indizes für die Tabelle `Users`
+-- Indizes fÃ¼r die Tabelle `Messages`
+--
+ALTER TABLE `Messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `messages_chat_id_index` (`chat_id`),
+  ADD KEY `messages_user_id_index` (`user_id`);
+
+--
+-- Indizes fÃ¼r die Tabelle `Users`
 --
 ALTER TABLE `Users`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT für exportierte Tabellen
+-- AUTO_INCREMENT fÃ¼r exportierte Tabellen
 --
 
 --
--- AUTO_INCREMENT für Tabelle `DirectChats`
+-- AUTO_INCREMENT fÃ¼r Tabelle `DirectChats`
 --
 ALTER TABLE `DirectChats`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT für Tabelle `GroupChats`
+-- AUTO_INCREMENT fÃ¼r Tabelle `GroupChats`
 --
 ALTER TABLE `GroupChats`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `Users`
+-- AUTO_INCREMENT fÃ¼r Tabelle `Messages`
+--
+ALTER TABLE `Messages`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT fÃ¼r Tabelle `Users`
 --
 ALTER TABLE `Users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
-
-
-
-CREATE TABLE
-  `Messages` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `chat_id` BIGINT NOT NULL,
-    `user_id` BIGINT NOT NULL,
-    `content` text NOT NULL
-  );
-
-ALTER TABLE `Messages` ADD INDEX `messages_chat_id_index` (`chat_id`);
-
-ALTER TABLE `Messages` ADD INDEX `messages_user_id_index` (`user_id`);
-ALTER TABLE `Messages` ADD CONSTRAINT `messages_chat_id_foreign` FOREIGN KEY (`chat_id`) REFERENCES `DirectChats` (`id`);
-ALTER TABLE `Messages` ADD CONSTRAINT `messages_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -34,6 +34,5 @@ async function saveMessage(message) {
         },
         body: JSON.stringify(message)
     });
-    console.log(response);
     return response.json();
 }

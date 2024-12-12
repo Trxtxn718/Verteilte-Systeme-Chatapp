@@ -52,8 +52,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('chat', (chat) => {
-    
+  socket.on('chat', async (chat) => {
+    const user = await fetch(`http://nginx:80/backend/users/${chat.user_2}`);
   });
 
 

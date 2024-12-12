@@ -26,7 +26,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.get('/:username', (req, res) => {
+router.get('getUserByUsername/:username', (req, res) => {
     Users.findOne({ where: { username: req.params.username } }).then(user => {
         res.status(200).json(user);
     }).catch(err => {

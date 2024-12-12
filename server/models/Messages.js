@@ -37,7 +37,7 @@ Messages.init(
                 key: 'id'
             }
         },
-        message: {
+        content: {
             type: DataTypes.STRING,
             allowNull: false
         }

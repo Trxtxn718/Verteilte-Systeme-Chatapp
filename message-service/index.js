@@ -4,6 +4,7 @@ const { createServer } = require("node:http");
 const { join } = require("node:path");
 const mqttAdapter = require("socket.io-mqtt");
 const mqtt = require("mqtt");
+const { formatMessage } = require("./message.service");
 
 
 const app = express();
@@ -37,14 +38,23 @@ io.on('connection', (socket) => {
     console.log(users);
   });
 
-  socket.on('message', (msg) => {
-    console.log(`Message received: ${msg}`);
-    
+  socket.on('message', async (msg) => {
+    msgObj = await JSON.parse(msg);
+    console.log(`Message received: ${msgObj.message}`);
+    const formatedMessage = await formatMessage(msgObj);
+    console.log(formatedMessage);
+    if (users[formatedMessage.receiver_id] != null) {
+      io.to(users[formatedMessage.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+    }
+    else {
+      console.log(`User ${formatedMessage.receiver_id} not online`);
+      mqttClient.publish('VSChatMessage/topic', JSON.stringify(formatedMessage));
+    }
   });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
-  } );
+  });
 });
 
 
@@ -56,12 +66,18 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (topic, message) => {
-  console.log(`MQTT Message received: ${topic} - ${message.toString()}`);
-  io.emit('mqtt message', { topic, message: message.toString() });
+  console.log(`MQTT Message received:${message.toString()}`);
+  const messageObj = JSON.parse(message);
+  if (users[messageObj.receiver_id] != null) {
+    io.to(users[messageObj.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+  }
+  else {
+    console.log(`User ${messageObj.receiver_id} not online`);
+  }
 });
 
 // Themen abonnieren
-mqttClient.subscribe('test/topic');
+mqttClient.subscribe('VSChatMessage/topic');
 
 
 server.listen(PORT, '0.0.0.0');

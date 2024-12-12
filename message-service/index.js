@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     users = Object.fromEntries(Object.entries(users).filter(([key, value]) => value !== socket.id));
-    console.log(users);
+    console.log("Users: "+ users);
     console.log('user disconnected');
   });
 });

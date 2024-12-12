@@ -67,10 +67,25 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    // flex: 1;
+    height: 100%;
 
     #chat-history {
-        flex: 1;
+        // flex: 1;
+        height: 100%;
+        overflow: auto;
+
+        #old{
+            display: flex;
+            flex-direction: column-reverse;
+
+            
+        }
+
+        #new{
+            display: flex;
+            flex-direction: column;
+        }
     }
 
     #chat-input {

@@ -16,11 +16,14 @@ export class HomeComponent {
   activeChat: any;
   messages: any[] = [];
   chatList: any[] = [];
-  messagesList: any[] = [];
+  oldMessagesList: any[] = [];
+  newMessagesList: any[] = [];
   @ViewChild("chatInsertPoint", { read: ViewContainerRef }) cip!: ViewContainerRef;
-  @ViewChild("messageInsertPoint", { read: ViewContainerRef }) mip!: ViewContainerRef;
+  @ViewChild("newInsertPoint", { read: ViewContainerRef }) nip!: ViewContainerRef;
+  @ViewChild("oldInsertPoint", { read: ViewContainerRef }) oip!: ViewContainerRef;
   cipRef!: ComponentRef<ChatListItemComponent>;
-  mipRef!: ComponentRef<ChatMessageComponent>;
+  nipRef!: ComponentRef<ChatMessageComponent>;
+  oipRef!: ComponentRef<ChatMessageComponent>;
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
@@ -31,10 +34,16 @@ export class HomeComponent {
     this.chatList.push(this.cipRef.instance);
   }
 
-  addMessage(data: any) {
-    this.mipRef = this.mip.createComponent(ChatMessageComponent);
-    this.mipRef.instance.message = data;
-    this.messagesList.push(this.cipRef.instance);
+  addOldMessage(data: any) {
+    this.oipRef = this.oip.createComponent(ChatMessageComponent);
+    this.oipRef.instance.message = data;
+    this.oldMessagesList.push(this.cipRef.instance);
+  }
+
+  addNewMessage(data: any) {
+    this.nipRef = this.nip.createComponent(ChatMessageComponent);
+    this.nipRef.instance.message = data;
+    this.newMessagesList.push(this.cipRef.instance);
   }
 
   constructor(private socketService: SocketService) {
@@ -75,7 +84,30 @@ export class HomeComponent {
 
     document.addEventListener('DOMContentLoaded', () => {
       this.createChat();
+
+      this.getChatHistory().forEach((message: any) => {
+        this.addOldMessage(message);
+      });
+
+      const chatHistory = document.getElementById('chat-history') as HTMLElement;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
     });
+  }
+
+  ngOnDestroy() {
+    this.socketSubscription.unsubscribe();
+  }
+
+  onScroll(event: any) {
+    if (event.target.scrollTop === 0) {
+      const scrollMax = event.target.scrollTopMax;
+      console.log('Scroll max:', scrollMax);
+      console.log('Scrolled to top');
+      this.getChatHistory().forEach((message: any) => {
+        this.addOldMessage(message);
+      });
+      event.target.scrollTop = event.target.scrollTopMax - scrollMax;
+    }
   }
 
   sendMessage() {
@@ -85,7 +117,12 @@ export class HomeComponent {
     chatBar.style.height = "1.2em";
     console.log('Sending message:', message);
 
+    this.addNewMessage({ message, time: new Date().toLocaleString() });
+
     this.socketService.emit('message', { message });
+
+    const chatHistory = document.getElementById('chat-history') as HTMLElement;
+    chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 
   openChat(openedChat?: ChatListItemComponent) {
@@ -105,10 +142,22 @@ export class HomeComponent {
 
     const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
     chatInfo.innerText = openedChat?.chat.name || ' ';
-  }
 
-  ngOnDestroy() {
-    this.socketSubscription.unsubscribe();
+    const chatHistory = this.getChatHistory();
+
+    const oldChat = document.getElementById('old') as HTMLElement;
+    while (oldChat.childNodes[0] && oldChat.childNodes[0] instanceof HTMLElement) {
+      oldChat.removeChild(oldChat.childNodes[0]);
+    }
+
+    const newChat = document.getElementById('new') as HTMLElement;
+    while (newChat.childNodes[0] && newChat.childNodes[0] instanceof HTMLElement) {
+      newChat.removeChild(newChat.childNodes[0]);
+    }
+
+    chatHistory.forEach((message: any) => {
+      this.addOldMessage(message);
+    });
   }
 
   createChat() {
@@ -146,8 +195,28 @@ export class HomeComponent {
     });
   }
 
-  getChatHistory() {
+  getChatHistory(start: number = 0, end: number = 10, chatId: number = this.activeChat?.chat.id) {
     console.log('Getting chat history');
+    const messages = [
+      { message: 'Hello', time: new Date().toLocaleString() },
+      { message: 'How are you?', time: new Date().toLocaleString() },
+      { message: 'I am fine', time: new Date().toLocaleString() },
+      { message: 'Thank you', time: new Date().toLocaleString() },
+      { message: 'Goodbye', time: new Date().toLocaleString() },
+
+      { message: 'Hello', time: new Date().toLocaleString() },
+      { message: 'How are you?', time: new Date().toLocaleString() },
+      { message: 'I am fine', time: new Date().toLocaleString() },
+      { message: 'Thank you', time: new Date().toLocaleString() },
+      { message: 'Goodbye', time: new Date().toLocaleString() },
+      { message: 'Hello', time: new Date().toLocaleString() },
+      { message: 'How are you?', time: new Date().toLocaleString() },
+      { message: 'I am fine', time: new Date().toLocaleString() },
+      { message: 'Thank you', time: new Date().toLocaleString() },
+      { message: 'Goodbye', time: new Date().toLocaleString() }
+    ];
+
+    return messages.reverse();
     fetch('http://localhost:3000/messages?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
       response.json().then((data) => {
         console.log('Chat history:', data);

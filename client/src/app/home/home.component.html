@@ -23,8 +23,13 @@
                 </div>
             </div>
             <div id="chat" class="bordered">
-                <div id="chat-history">
-                    <ng-template #messageInsertPoint></ng-template>
+                <div id="chat-history" (scroll)="onScroll($event)">
+                    <div id="old">
+                        <ng-template #oldInsertPoint></ng-template>
+                    </div>
+                    <div id="new">
+                        <ng-template #newInsertPoint></ng-template>
+                    </div>
                 </div>
                 <div id="chat-input">
                     <textarea id="chat-bar" placeholder="Type a message..."

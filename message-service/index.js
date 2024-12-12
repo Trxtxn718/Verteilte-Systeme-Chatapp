@@ -25,18 +25,18 @@ io.adapter(mqttAdapter(
 ));
 
 
-// io.on('connection', (socket) => {
-//   console.log('a user connected');
-//   socket.on('chat message', (msg) => {
-//     console.log('message: ' + msg);
-//     io.emit('chat message', msg);
-//     mqttClient.publish('test/topic', msg);
-//   });
-// });
+io.on('connection', (socket) => {
+  console.log(socket);
+  socket.on('chat message', (msg) => {
+    console.log('message: ' + msg);
+    io.emit('chat message', msg);
+    mqttClient.publish('test/topic', msg);
+  });
+});
 
-// io.on('disconnect', () => {
-//   console.log('user disconnected');
-// });
+io.on('disconnect', () => {
+  console.log('user disconnected');
+});
 
 const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
 console.log('MQTT-Client connecting to HiveMQ');

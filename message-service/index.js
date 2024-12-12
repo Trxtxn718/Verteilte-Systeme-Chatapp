@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
     const formatedMessage = await formatMessage(msgObj);
     console.log(formatedMessage);
     if (users[formatedMessage.receiver_id] != null) {
-      io.to(users[formatedMessage.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+      io.to(users[formatedMessage.receiver_id]).emit('message', JSON.stringify(formatedMessage));
     }
     else {
       console.log(`User ${formatedMessage.receiver_id} not online`);
@@ -53,7 +53,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat', async (chat) => {
-    const user = await fetch(`http://nginx:80/backend/users/${chat.user_2}`);
+    const user = await fetch(`http://nginx:80/backend/users/getUserByUsername/${chat.target_user}`);
+    const userJson = await user.json();
+    const chatObj = {
+      user_1: chat.user_id,
+      user_2: userJson.user_id
+    };
+    await fetch('http://nginx:80/backend/chats/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(chatObj)
+    });
   });
 
 
@@ -76,7 +88,7 @@ mqttClient.on('message', (topic, message) => {
   console.log(`MQTT Message received:${message.toString()}`);
   const messageObj = JSON.parse(message);
   if (users[messageObj.receiver_id] != null) {
-    io.to(users[messageObj.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+    io.to(users[messageObj.receiver_id]).emit('message', JSON.stringify(formatedMessage));
   }
   else {
     console.log(`User ${messageObj.receiver_id} not online`);

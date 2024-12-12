@@ -186,15 +186,15 @@ export class HomeComponent {
   }
 
   leaveChat() {
-    console.log('Leaving chat');
-    fetch('http://localhost:3000/leave?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString(), {
-      method: 'POST'
-    }).then((response) => {
-      console.log('Left chat:', response);
-      window.location.reload();
-    }).catch((error) => {
-      console.error(error);
-    });
+    // console.log('Leaving chat');
+    // fetch('http://localhost:3000/leave?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString(), {
+    //   method: 'POST'
+    // }).then((response) => {
+    //   console.log('Left chat:', response);
+    //   window.location.reload();
+    // }).catch((error) => {
+    //   console.error(error);
+    // });
   }
 
   getChatHistory(start: number = 0, end: number = 10, chatId: number = this.activeChat?.chat.id) {

@@ -17,7 +17,7 @@ export class RegisterComponent {
     const password = document.getElementById('password') as HTMLInputElement;
     const passwordRepeat = document.getElementById('passwordRepeat') as HTMLInputElement;
 
-    this.http.post<any>('http://localhost:8080/users/register', {
+    this.http.post<any>('http://localhost:80/backend/users/register', {
       username: username.value,
       email: email.value,
       password: password.value,

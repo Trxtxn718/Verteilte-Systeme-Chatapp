@@ -17,7 +17,7 @@ export class LoginComponent {
 
     console.log(email.value, password.value);
 
-    this.http.post<any>('http://localhost:8080/users/login', {
+    this.http.post<any>('http://localhost:80/backend/users/login', {
       email: email.value,
       password: password.value,
     }, { observe: 'response' }).pipe().subscribe({

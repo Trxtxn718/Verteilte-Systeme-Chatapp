@@ -121,6 +121,22 @@ ALTER TABLE `Users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
+
+
+CREATE TABLE
+  `Messages` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `chat_id` BIGINT NOT NULL,
+    `user_id` BIGINT NOT NULL,
+    `content` text NOT NULL
+  );
+
+ALTER TABLE `Messages` ADD INDEX `messages_chat_id_index` (`chat_id`);
+
+ALTER TABLE `Messages` ADD INDEX `messages_user_id_index` (`user_id`);
+ALTER TABLE `Messages` ADD CONSTRAINT `messages_chat_id_foreign` FOREIGN KEY (`chat_id`) REFERENCES `DirectChats` (`id`);
+ALTER TABLE `Messages` ADD CONSTRAINT `messages_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -2,6 +2,7 @@ export async function formatMessage(message) {
     console.log(`Message received: ${message}`);
     const receiver = await getReceiver(message);
     console.log(receiver);
+    saveMessage({chat_id: message.chat_id, user_id: message.user_id, content: message.message});
     return {
         sender_id: message.sender_id,
         receiver_id: receiver.id,
@@ -33,5 +34,6 @@ async function saveMessage(message) {
         },
         body: JSON.stringify(message)
     });
+    console.log(response);
     return response.json();
 }

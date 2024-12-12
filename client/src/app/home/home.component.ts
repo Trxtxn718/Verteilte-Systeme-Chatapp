@@ -125,8 +125,6 @@ export class HomeComponent {
 
       this.addNewMessage(message);
 
-      this.socketService.emit('message', { message });
-
       const chatHistory = document.getElementById('chat-history') as HTMLElement;
       chatHistory.scrollTop = chatHistory.scrollHeight;
 

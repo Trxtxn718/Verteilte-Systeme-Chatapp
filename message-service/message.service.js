@@ -15,8 +15,9 @@ export async function formatMessage(message) {
 async function getReceiver(message) {
     console.log('Getting chat_id');
     console.log('Message:', message.chat_id);
+    console.log('Address:', 'http://nginx:80/backend/chats/' + message.chat_id);
     const chat = await (await fetch('http://nginx:80/backend/chats/' + message.chat_id)).json();
-    
+
     console.log('Chat:', chat);
     if (chat.user_1 == message.sender_id) {
         return {id : chat.user_2, username: await getReceiverUsername(chat.user_2)};

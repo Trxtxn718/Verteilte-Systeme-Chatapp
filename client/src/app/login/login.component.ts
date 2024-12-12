@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent {
 
     console.log(email.value, password.value);
 
-    this.http.post<any>('http://localhost:80/backend/users/login', {
+    this.http.post<any>(environment.backend + '/users/login', {
       email: email.value,
       password: password.value,
     }, { observe: 'response' }).pipe().subscribe({

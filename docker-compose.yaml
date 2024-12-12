@@ -37,6 +37,18 @@ services:
     #   - backend
     networks:
       - loadbalancing
+  
+  frontend:
+    build: client
+    # deploy:
+    #   replicas: 3
+    #   mode: replicated
+    #   endpoint_mode: vip
+    restart: always
+    ports:
+      - "4200:4200"
+    networks:
+      - loadbalancing
 
   mariadb:
     build: db

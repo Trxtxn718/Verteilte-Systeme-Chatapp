@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-register',
@@ -17,7 +18,7 @@ export class RegisterComponent {
     const password = document.getElementById('password') as HTMLInputElement;
     const passwordRepeat = document.getElementById('passwordRepeat') as HTMLInputElement;
 
-    this.http.post<any>('http://localhost:80/backend/users/register', {
+    this.http.post<any>(environment.backend + '/users/register', {
       username: username.value,
       email: email.value,
       password: password.value,

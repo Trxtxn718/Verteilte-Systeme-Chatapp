@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
+import { environment } from '../../environment';
 
 @Injectable({
   providedIn: 'any'
@@ -10,7 +11,7 @@ export class SocketService {
 
 
   constructor() {
-    this.socket = io('http://localhost:80/ws');
+    this.socket = io(environment.ws);
   }
 
   emit(event: string, data: any) {

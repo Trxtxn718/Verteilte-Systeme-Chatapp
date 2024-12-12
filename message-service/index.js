@@ -23,5 +23,9 @@ io.on('connection', (socket) => {
   });
 });
 
+io.on('disconnect', () => {
+  console.log('user disconnected');
+});
+
 server.listen(PORT, '0.0.0.0');
 console.log(`Running on http://${HOST}:${PORT}`);

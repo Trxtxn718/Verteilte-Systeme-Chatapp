@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
 
   socket.on('message', async (msg) => {
     console.log('MSG:')
-    console.log(msg.message.message);
+    console.log(msg);
     console.log('MSG END')
     msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);

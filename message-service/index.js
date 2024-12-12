@@ -52,6 +52,11 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('chat', (chat) => {
+    
+  });
+
+
   socket.on('disconnect', () => {
     users = Object.fromEntries(Object.entries(users).filter(([key, value]) => value !== socket.id));
     console.log(users);

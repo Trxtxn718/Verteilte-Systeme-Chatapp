@@ -26,6 +26,15 @@ router.get('/:id', (req, res) => {
     });
 });
 
+router.get('/:username', (req, res) => {
+    Users.findOne({ where: { username: req.params.username } }).then(user => {
+        res.status(200).json(user);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+    });
+});
+
 // Try to create new user with attributes
 router.post('/register', async (req, res) => {
     // Check if user data is complete

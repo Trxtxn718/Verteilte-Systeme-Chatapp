@@ -11,7 +11,11 @@ export class SocketService {
 
 
   constructor() {
-    this.socket = io(environment.ws);
+    this.socket = io(environment.ws, {
+      path: '/socket.io',
+      transports: ['websocket'],
+      secure: true,
+    });
   }
 
   emit(event: string, data: any) {

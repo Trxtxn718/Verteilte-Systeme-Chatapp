@@ -60,9 +60,11 @@ export class HomeComponent {
     //   });
     // }).catch((error) => { console.error(error); });
 
-    this.socketSubscription = this.socketService.on('chat').subscribe((data: any) => {
-      console.log('Received chat:', data);
-      // this.addChild(data);
+    this.socketService.emit('register', JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login').id);
+    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+      console.log('Received message:', data);
+      this.messages.push(data);
+      this.addNewMessage(data);
     });
   }
 
@@ -91,7 +93,7 @@ export class HomeComponent {
   }
 
   ngOnDestroy() {
-    this.socketSubscription.unsubscribe();
+    // this.socketSubscription.unsubscribe();
   }
 
   onScroll(event: any) {
@@ -119,7 +121,7 @@ export class HomeComponent {
 
 
       console.log('Sending message:', message);
-
+      this.socketService.emit('message', JSON.stringify(message));
 
       this.addNewMessage(message);
 
@@ -148,7 +150,7 @@ export class HomeComponent {
   }
 
   openChat(openedChat?: ChatListItemComponent) {
-    this.socketSubscription.unsubscribe();
+    // this.socketSubscription.unsubscribe();
     console.log('Opening chat', openedChat);
     this.chatList.forEach((chat: ChatListItemComponent) => {
       if (chat !== openedChat) {
@@ -157,10 +159,10 @@ export class HomeComponent {
     });
     this.activeChat = openedChat;
 
-    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
-      console.log('Received message:', data);
-      this.messages.push(data);
-    });
+    // this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+    //   console.log('Received message:', data);
+    //   this.messages.push(data);
+    // });
 
     const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
     chatInfo.innerText = openedChat?.chat.username || ' ';
@@ -191,6 +193,8 @@ export class HomeComponent {
 
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'none';
+
+    // this.socketService.emit('create', { chatName });
 
     this.addChatComponent({ id: 1, username: chatName }, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
   }

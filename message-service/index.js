@@ -9,7 +9,13 @@ const { formatMessage } = require("./message.service");
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ['Content-Type, Authorization, Content-Length, X-Requested-With'],
+  },
+});
 
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '127.0.0.1'
@@ -27,7 +33,6 @@ io.adapter(mqttAdapter(
   }
 ));
 
-
 io.on('connection', (socket) => {
   console.log('user connected');
 
@@ -42,9 +47,9 @@ io.on('connection', (socket) => {
     msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);
     const formatedMessage = await formatMessage(msgObj);
-    console.log(formatedMessage);
+    console.log('Formated Message' + formatedMessage);
     if (users[formatedMessage.receiver_id] != null) {
-      io.to(users[formatedMessage.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+      io.to(users[formatedMessage.receiver_id]).emit('message', JSON.stringify(formatedMessage));
     }
     else {
       console.log(`User ${formatedMessage.receiver_id} not online`);
@@ -69,7 +74,7 @@ mqttClient.on('message', (topic, message) => {
   console.log(`MQTT Message received:${message.toString()}`);
   const messageObj = JSON.parse(message);
   if (users[messageObj.receiver_id] != null) {
-    io.to(users[messageObj.receiver_id]).emit('message',JSON.stringify(formatedMessage));
+    io.to(users[messageObj.receiver_id]).emit('message', JSON.stringify(formatedMessage));
   }
   else {
     console.log(`User ${messageObj.receiver_id} not online`);

@@ -29,7 +29,6 @@ export class RegisterComponent {
         console.log(response);
         if (response && response.status === 201) {
           localStorage.setItem('user', JSON.stringify(response.body));
-          // this.socket.emit('register', response.body.id);
           window.location.href = '/';
         } else {
           alert('Nutzername bzw. Email bereits vergeben oder Passwörter stimmen nicht überein');

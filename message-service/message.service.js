@@ -13,7 +13,9 @@ export async function formatMessage(message) {
 }
 
 async function getReceiver(message) {
+    
     console.log('Getting chat_id');
+    console.log(message);
     console.log('Message:', message.chat_id);
     const chat = await (await fetch('http://nginx:80/backend/chats/' + message.chat_id)).json();
     

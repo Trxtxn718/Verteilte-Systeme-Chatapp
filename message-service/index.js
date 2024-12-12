@@ -7,6 +7,7 @@ const mqtt = require("mqtt");
 const { formatMessage } = require("./message.service");
 
 
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -44,6 +45,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', async (msg) => {
+    console.log('MSG:')
+    console.log(msg.message.message);
+    console.log('MSG END')
     msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);
     const formatedMessage = await formatMessage(msgObj);

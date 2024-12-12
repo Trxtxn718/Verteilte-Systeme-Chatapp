@@ -3,6 +3,8 @@ import { ChatListItemComponent } from '../chat-list-item/chat-list-item.componen
 import { ChatMessageComponent } from '../chat-message/chat-message.component';
 import { Subscription } from 'rxjs';
 import { SocketService } from '../socket.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +14,9 @@ import { SocketService } from '../socket.service';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  private socketSubscription: Subscription;
+  private messageSubscription: Subscription;
+  private chatSubscription: Subscription;
+  private user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
   activeChat?: ChatListItemComponent;
   messages: any[] = [];
   chatList: any[] = [];
@@ -27,7 +31,7 @@ export class HomeComponent {
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
-  addChatComponent(chat: any, message: any) {
+  addChatComponent(chat: any, message?: any) {
     this.cipRef = this.cip.createComponent(ChatListItemComponent);
     this.cipRef.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
     this.cipRef.instance.chat = chat;
@@ -48,7 +52,7 @@ export class HomeComponent {
     this.newMessagesList.push(this.cipRef.instance);
   }
 
-  constructor(private socketService: SocketService) {
+  constructor(private http: HttpClient, private socketService: SocketService) {
     // get all chats
     // this.addChild({ id: 1, name: 'Chat 1' });
     // fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
@@ -60,11 +64,21 @@ export class HomeComponent {
     //   });
     // }).catch((error) => { console.error(error); });
 
-    this.socketService.emit('register', JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login').id);
-    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+    this.socketService.emit('register', this.user.id);
+    this.messageSubscription = this.socketService.on('message').subscribe((data: any) => {
       console.log('Received message:', data);
-      this.messages.push(data);
-      this.addNewMessage(data);
+      const targetChat = this.chatList.filter((chat: ChatListItemComponent) => chat.chat.id === data.chat_id)[0]
+      targetChat.lastMessage = data;
+      this.refreshChatListItem(targetChat);
+
+      if (this.activeChat?.chat.id === data.chat_id) {
+        this.addNewMessage(data);
+      }
+    });
+
+    this.chatSubscription = this.socketService.on('chat').subscribe((data: any) => {
+      console.log('Received chat:', data);
+      this.addChatComponent(data, { content: '', time: new Date().toLocaleString(), username: data.username });
     });
   }
 
@@ -87,6 +101,14 @@ export class HomeComponent {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      this.http.get(environment.backend + '/chats/user/' + this.user.id).subscribe((data: any) => {
+        console.log('Chats:', data);
+        data.forEach((chat: any) => {
+          this.addChatComponent(chat.chat, chat.lastMessage); 
+        });
+      });
+
+
       const chatHistory = document.getElementById('chat-history') as HTMLElement;
       chatHistory.scrollTop = chatHistory.scrollHeight;
     });
@@ -114,8 +136,7 @@ export class HomeComponent {
       chatBar.value = '';
       chatBar.style.height = "1.2em";
     } else {
-      const user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
-      const message = { message: chatBar.value, time: new Date().toLocaleString(), user_id: user.id, chat_id: this.activeChat?.chat.id, username: user.username };
+      const message = { content: chatBar.value, time: new Date().toLocaleString(), user_id: this.user.id, chat_id: this.activeChat?.chat.id, username: this.user.username };
       chatBar.value = '';
       chatBar.style.height = "1.2em";
 
@@ -194,7 +215,7 @@ export class HomeComponent {
 
     // this.socketService.emit('create', { chatName });
 
-    this.addChatComponent({ id: 1, username: chatName }, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
+    this.addChatComponent({ id: 1, username: chatName }, { content: '1', time: new Date().toLocaleString(), username: 'User1' });
   }
 
   openPopup() {
@@ -222,16 +243,16 @@ export class HomeComponent {
   getChatHistory(start: number = 0, end: number = 10, chatId: number = this.activeChat?.chat.id) {
     console.log('Getting chat history');
     const messages = [
-      { message: '1', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '2', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '3', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '4', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '5', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '1', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '2', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '3', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '4', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '5', time: new Date().toLocaleString(), username: 'User1' },
 
-      { message: '6', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '7', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '8', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '9', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '6', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '7', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '8', time: new Date().toLocaleString(), username: 'User1' },
+      { content: '9', time: new Date().toLocaleString(), username: 'User1' },
     ];
 
     return messages.reverse();

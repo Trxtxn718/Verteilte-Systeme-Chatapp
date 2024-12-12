@@ -22,7 +22,9 @@ export class ChatListItemComponent {
       this.chat = { id: 1, username: 'Anonymous' };
     }
     if (!this.lastMessage) {
-      this.lastMessage = { time: new Date().toLocaleString(), message: 'Placeholder message', username: 'Anonymous' };
+      this.lastMessage = { time: new Date().toLocaleString(), content: '', username: '' };
+    } else {
+      this.lastMessage.time = new Date(this.lastMessage.time).toLocaleString();
     }
     if (!this.selected || this.selected !== 'true') {
       this.selected = 'false';

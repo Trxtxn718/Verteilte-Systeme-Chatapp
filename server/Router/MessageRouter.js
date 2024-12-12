@@ -22,6 +22,8 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    req.body.time = new Date().toISOString();
+    console.log(req.body);
     Messages.create(req.body).then(message => {
         res.status(201).json(message);
     }).catch(err => {

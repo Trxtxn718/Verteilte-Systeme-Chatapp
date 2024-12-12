@@ -12,7 +12,7 @@ export class ChatMessageComponent {
 
   constructor() {
     if (!this.message) {
-      this.message = {time: new Date().toLocaleString(), message: 'Placeholder message'};
+      this.message = {time: new Date().toLocaleString(), content: 'Placeholder message'};
     }
   }
 }

@@ -2,10 +2,10 @@ version: '3.3'
 services:
   backend:
     build: server
-    # deploy:
-    #   replicas: 1
-    #   mode: replicated
-    #   endpoint_mode: vip
+    deploy:
+      replicas: 3
+      mode: replicated
+      endpoint_mode: vip
     restart: always
     environment:
       MYSQL_DATABASE: mariadb
@@ -21,8 +21,6 @@ services:
         condition: service_healthy
     networks:
       - loadbalancing
-    ports:
-      - "8080:8080"
 
   message-service:
     build: message-service
@@ -33,10 +31,10 @@ services:
     environment:
       - PORT=8081
     restart: always
-    links:
-      - backend
-    depends_on:
-      - backend
+    # links:
+    #   - backend
+    # depends_on:
+    #   - backend
     networks:
       - loadbalancing
 
@@ -63,7 +61,13 @@ services:
       - loadbalancing
     depends_on:
       - backend
-
+  mqtt:
+    build: mqtt
+    ports:
+      - "1883:1883"
+    networks:
+      - loadbalancing
+      
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always

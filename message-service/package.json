@@ -10,6 +10,8 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.1",
-    "socket.io": "^4.8.1"
+    "mqtt": "^5.10.3",
+    "socket.io": "^4.8.1",
+    "socket.io-mqtt": "^0.1.0"
   }
 }

@@ -30,16 +30,23 @@ io.adapter(mqttAdapter(
 io.on('connection', (socket) => {
   console.log('user connected');
 
+  //TODO Check if user is registered
   socket.on('register', (userId) => {
     console.log(`User ${userId} registered`);
     users[userId] = socket.id;
     console.log(users);
   });
+
+  socket.on('message', (msg) => {
+    console.log(`Message received: ${msg}`);
+    
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  } );
 });
 
-io.on('disconnect', () => {
-  console.log('user disconnected');
-});
 
 const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
 console.log('MQTT-Client connecting to HiveMQ');

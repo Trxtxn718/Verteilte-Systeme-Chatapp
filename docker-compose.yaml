@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-  server:
+  backend:
     build: server
     deploy:
       replicas: 3
@@ -17,18 +17,24 @@ services:
     links:
       - mariadb
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
+    networks:
+      - loadbalancing
+
   message-service:
     build: message-service
-    ports:
-      - 8081:8080
+    deploy:
+      replicas: 3
+      mode: replicated
+      endpoint_mode: vip
     environment:
-      - PORT=8080
+      - PORT=8081
     restart: always
-    links:
-      - server
-    depends_on:
-      - server
+    # links:
+    #   - backend
+    # depends_on:
+    #   - backend
     networks:
       - loadbalancing
 
@@ -41,6 +47,11 @@ services:
       MARIADB_ROOT_PASSWORD: rootpass
     networks:
       - loadbalancing
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   nginx:
     build: nginx-load-balancer
@@ -49,8 +60,14 @@ services:
     networks:
       - loadbalancing
     depends_on:
-      - server
-
+      - backend
+  mqtt:
+    build: mqtt
+    ports:
+      - "1883:1883"
+    networks:
+      - loadbalancing
+      
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always
@@ -58,7 +75,10 @@ services:
       - 8085:80
     environment:
       PMA_HOST: mariadb
+    networks:
+      - loadbalancing
 
 networks:
   loadbalancing:
+    driver: bridge
     

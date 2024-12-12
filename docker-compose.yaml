@@ -21,6 +21,7 @@ services:
         condition: service_healthy
     networks:
       - loadbalancing
+
   message-service:
     build: message-service
     deploy:
@@ -60,7 +61,13 @@ services:
       - loadbalancing
     depends_on:
       - backend
-
+  mqtt:
+    build: mqtt
+    ports:
+      - "1883:1883"
+    networks:
+      - loadbalancing
+      
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always

@@ -38,7 +38,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', (msg) => {
-    console.log(`Message received: ${msg}`);
+    msgObj = JSON.parse(msg);
+    console.log(`Message received: ${msgObj.message}`);
     
   });
 

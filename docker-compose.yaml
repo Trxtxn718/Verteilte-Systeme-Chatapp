@@ -22,7 +22,7 @@ services:
     networks:
       - loadbalancing
     ports:
-      - "3000:3000"
+      - "8080:8080"
 
   message-service:
     build: message-service

@@ -7,7 +7,7 @@ const { Users } = require('../models/Users');
 
 // Try to get all users !!!DEBUG!!!
 // TODO delete
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     Users.findAll().then(users => {
         res.status(200).json(users);
     }).catch(err => {
@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 });
 
 // Try to get user information of user with id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     Users.findByPk(req.params.id).then(user => {
         res.status(200).json(user);
     }).catch(err => {
@@ -64,13 +64,13 @@ router.post('/register', async (req, res) => {
     // Create user
     Users.create(req.body).then(user => {
         // Set cookie with token
-        res.cookie('token', jwt.sign({ id: user.id, username: user.username}, process.env.JWT_SECRET), {
+        res.cookie('token', jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET), {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
             maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
         });
-        res.status(301).redirect('http://localhost:4200'); // Redirect to home
+        res.status(201).json({username: user.username, email: user.email, user_id: user.id});
     }).catch(err => {
         console.error(err);
         res.status(500).json(err);
@@ -78,7 +78,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Try to login user with email and password
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     // Check if user data is complete
     if (req.body.email == null || req.body.password == null) {
         res.status(400).json({
@@ -103,7 +103,7 @@ router.post('/login', (req, res) => {
             return;
         }
         // Set cookie with token
-        res.cookie('token', jwt.sign({ id: user.id, username: user.username}, process.env.JWT_SECRET), {
+        res.cookie('token', jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET), {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
@@ -117,7 +117,7 @@ router.post('/login', (req, res) => {
 });
 
 // Try to update user with id and attributes
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
 
     // Check if user data is complete
     if (req.body.password == null) {
@@ -186,7 +186,7 @@ router.put('/:id', (req, res) => {
 });
 
 // Try to delete user with id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     Users.destroy({
         where: {
             id: req.params.id

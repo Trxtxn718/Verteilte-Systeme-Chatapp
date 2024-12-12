@@ -70,7 +70,7 @@ router.post('/register', async (req, res) => {
             sameSite: 'none',
             maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
         });
-        res.status(201).json({username: user.username, email: user.email, user_id: user.id});
+        res.status(201).json({username: user.username, email: user.email, id: user.id});
     }).catch(err => {
         console.error(err);
         res.status(500).json(err);
@@ -91,14 +91,14 @@ router.post('/login', async (req, res) => {
     Users.findOne({ where: { email: req.body.email } }).then(user => {
         if (user == null) {
             res.status(401).json({
-                message: "User not found."
+                message: "Wrong credentials."
             });
             return;
         }
         // Check if password is correct
         if (user.password != crypto.pbkdf2Sync(req.body.password, process.env.PASSWORD_SALT, 1000, 64, 'sha512').toString('hex')) {
             res.status(401).json({
-                message: "Password incorrect."
+                message: "Wrong credentials."
             });
             return;
         }
@@ -109,7 +109,7 @@ router.post('/login', async (req, res) => {
             sameSite: 'none',
             maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
         });
-        res.status(301).redirect('http://localhost:4200'); // Redirect to home
+        res.status(200).json({username: user.username, email: user.email, id: user.id});
     }).catch(err => {
         console.error(err);
         res.status(500).json(err);

@@ -132,10 +132,8 @@ export class HomeComponent {
       console.log('Old messages:', this.oldMessagesList);
       if (this.oldMessagesList.length > 0) {
         this.getChatHistory(this.oldMessagesList[this.oldMessagesList.length - 1].message.id);
-      } else {
-        this.getChatHistory();
+        event.target.scrollTop = event.target.scrollTopMax - scrollMax;
       }
-      event.target.scrollTop = event.target.scrollTopMax - scrollMax;
     }
   }
 
@@ -194,6 +192,9 @@ export class HomeComponent {
     this.clearChatHistory();
 
     this.getChatHistory();
+
+    const chatHistory = document.getElementById('chat-history') as HTMLElement;
+    chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 
   createChat() {
@@ -254,6 +255,7 @@ export class HomeComponent {
     this.http.get(environment.backend + '/messages/chat/' + chatId + '?max_id=' + max_id + '&limit=' + limit).subscribe((data: any) => {
       console.log('Chat history:', data);
       data.forEach((message: any) => {
+        message.time = new Date(message.time).toLocaleString();
         this.addOldMessage(message);
       });
     });

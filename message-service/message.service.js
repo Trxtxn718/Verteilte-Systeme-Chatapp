@@ -8,7 +8,8 @@ export async function formatMessage(message) {
         receiver_id: receiver.id,
         message: message.message,
         timestamp: message.timestamp,
-        receiver_username: receiver.username
+        receiver_username: receiver.username,
+        chat_id: message.chat_id
     }
 }
 

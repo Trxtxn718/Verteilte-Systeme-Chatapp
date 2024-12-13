@@ -16,25 +16,28 @@
         <div class="right">
             <div id="chat-info" class="horizontal-split">
                 <div class="left">
-                    <h2 id="chat-info-name">Chatname</h2>
+                    <h2 id="chat-info-name"></h2>
                 </div>
                 <div class="right">
                     <button id="leave-chat" class="btn btn-secondary" (click)="leaveChat()">Verlassen</button>
                 </div>
             </div>
             <div id="chat" class="bordered">
-                <div id="chat-history" (scroll)="onScroll($event)">
-                    <div id="old">
-                        <ng-template #oldInsertPoint></ng-template>
+                <!-- <div id="distance-block"></div> -->
+                <div id="chat-aligner">
+                    <div id="chat-history" (scroll)="onScroll($event)">
+                        <div id="old">
+                            <ng-template #oldInsertPoint></ng-template>
+                        </div>
+                        <div id="new">
+                            <ng-template #newInsertPoint></ng-template>
+                        </div>
                     </div>
-                    <div id="new">
-                        <ng-template #newInsertPoint></ng-template>
+                    <div id="chat-input">
+                        <textarea id="chat-bar" placeholder="Type a message..."
+                            oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
+                        <button id="chat-send" class="btn btn-primary" (click)="sendMessage()">Send</button>
                     </div>
-                </div>
-                <div id="chat-input">
-                    <textarea id="chat-bar" placeholder="Type a message..."
-                        oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
-                    <button id="chat-send" class="btn btn-primary" (click)="sendMessage()">Send</button>
                 </div>
             </div>
         </div>

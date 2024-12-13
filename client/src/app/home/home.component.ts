@@ -75,9 +75,10 @@ export class HomeComponent {
       } else {
         user = data.user1;
       }
-
+      console.log('User:', user);
+      console.log('Chat:', data.chat);
       let chat = { id: data.chat.id, username: user.username };
-      this.addChatComponent(data.chat, { content: '', time: new Date().toLocaleString(), username: user.username });
+      this.addChatComponent(chat, { content: '', time: new Date().toLocaleString(), username: user.username });
     });
   }
 

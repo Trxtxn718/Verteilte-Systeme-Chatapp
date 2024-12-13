@@ -46,8 +46,8 @@ io.on('connection', (socket) => {
     console.log(`Message received: ${msgObj.message}`);
     const formatedMessage = await formatMessage(msgObj);
     console.log('Formated Message' + formatedMessage);
-      mqttClient.publish('VSChatMessage/topic', JSON.stringify(formatedMessage));
-    
+    mqttClient.publish('VSChatMessage/topic', JSON.stringify(formatedMessage));
+
   });
 
   socket.on('chat', async (chat) => {
@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
       body: JSON.stringify(chatObj)
     })).json();
     const payload = {
-      receiver_id:chat.user_id,
+      receiver_id: chat.user_id,
       chat: newChat,
       user1: {
         id: chat.user_id,
@@ -88,7 +88,12 @@ io.on('connection', (socket) => {
 
 
   socket.on('disconnect', () => {
-    // users = Object.fromEntries(Object.entries(users).filter(([key, value]) => value !== socket.id));
+    const userId = Object.keys(users).find((key) => users[key] === socket.id);
+
+    if (userId) {
+      delete users[userId]; // Entferne den Benutzer aus dem Objekt
+      console.log(`Nutzer abgemeldet: ${userId}`);
+    }
     console.log("Users: " + users);
     console.log('user disconnected');
   });

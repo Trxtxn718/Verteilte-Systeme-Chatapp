@@ -23,18 +23,26 @@
         max-height: 80vh;
     }
 
-    > .right{
+    >.right {
         height: 80vh;
         display: flex;
         flex-direction: column;
     }
 
-    #chat-manager{
+    #chat-manager {
         margin-bottom: 0.55em;
+
+        .right {
+            display: flex;
+            justify-content: end;
+            align-items: start;
+        }
     }
 }
 
 #chat-list {
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     flex: 1;
     width: 25vw;
@@ -42,17 +50,18 @@
     margin-block: 0px;
 }
 
-#chat-info{
-    h2{
+#chat-info {
+    h2 {
         text-align: center;
-        margin-bottom: 1em;
+        margin-bottom: 0.25em;
         margin-top: 0;
     }
-    
-    .right{
+
+    .right {
         display: flex;
         justify-content: end;
         align-items: start;
+        padding: 0.25em;
     }
 }
 
@@ -60,10 +69,23 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    // flex: 1;
+    height: 100%;
 
     #chat-history {
-        flex: 1;
+        // flex: 1;
+        height: 100%;
+        overflow: auto;
+
+        #old {
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        #new {
+            display: flex;
+            flex-direction: column;
+        }
     }
 
     #chat-input {
@@ -92,7 +114,7 @@
     }
 }
 
-#new-chat-popup{
+#new-chat-popup {
     display: none;
     flex-direction: column;
     align-items: center;
@@ -104,24 +126,25 @@
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
 
-    #new-chat-card{
+    #new-chat-card {
         width: 40vw;
         background-color: $background-color-light;
         border-radius: 0.5em;
         padding: 1em;
 
-        h2{
+        h2 {
             text-align: center;
             margin-bottom: 1em;
         }
 
-        #input-div{
+        #input-div {
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1em;
         }
-        #new-chat-input{
+
+        #new-chat-input {
             flex: 1;
             padding: 0.5em;
             border: none;
@@ -132,12 +155,13 @@
             font-family: $font-family;
         }
 
-        .horizontal-split{
+        .horizontal-split {
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        .right{
+
+        .right {
             margin-left: 1em;
             flex: 0 1 auto;
         }

@@ -13,36 +13,58 @@ import { SocketService } from '../socket.service';
 })
 export class HomeComponent {
   private socketSubscription: Subscription;
-  activeChat: any;
+  activeChat?: ChatListItemComponent;
   messages: any[] = [];
   chatList: any[] = [];
-  @ViewChild("viewContainerRef", { read: ViewContainerRef }) vcr!: ViewContainerRef;
-  ref!: ComponentRef<ChatListItemComponent>;
+  oldMessagesList: any[] = [];
+  newMessagesList: any[] = [];
+  @ViewChild("chatInsertPoint", { read: ViewContainerRef }) cip!: ViewContainerRef;
+  @ViewChild("newInsertPoint", { read: ViewContainerRef }) nip!: ViewContainerRef;
+  @ViewChild("oldInsertPoint", { read: ViewContainerRef }) oip!: ViewContainerRef;
+  cipRef!: ComponentRef<ChatListItemComponent>;
+  nipRef!: ComponentRef<ChatMessageComponent>;
+  oipRef!: ComponentRef<ChatMessageComponent>;
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
-  addChild(data: any) {
-    this.ref = this.vcr.createComponent(ChatListItemComponent);
-    this.ref.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
-    this.ref.instance.chat = data;
-    this.chatList.push(this.ref.instance);
+  addChatComponent(chat: any, message: any) {
+    this.cipRef = this.cip.createComponent(ChatListItemComponent);
+    this.cipRef.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
+    this.cipRef.instance.chat = chat;
+    this.cipRef.instance.lastMessage = message;
+    this.chatList.push(this.cipRef.instance);
+  }
+
+  addOldMessage(data: any) {
+    this.oipRef = this.oip.createComponent(ChatMessageComponent);
+    this.oipRef.instance.message = data;
+
+    this.oldMessagesList.push(this.cipRef.instance);
+  }
+
+  addNewMessage(data: any) {
+    this.nipRef = this.nip.createComponent(ChatMessageComponent);
+    this.nipRef.instance.message = data;
+    this.newMessagesList.push(this.cipRef.instance);
   }
 
   constructor(private socketService: SocketService) {
     // get all chats
     // this.addChild({ id: 1, name: 'Chat 1' });
-    fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
-      response.json().then((data) => {
-        console.log('Chats:', data);
-        data.forEach((chat: any) => {
-          // this.addChild(chat);
-        });
-      });
-    }).catch((error) => { console.error(error); });
+    // fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
+    //   response.json().then((data) => {
+    //     console.log('Chats:', data);
+    //     data.forEach((chat: any) => {
+    //       // this.addChild(chat);
+    //     });
+    //   });
+    // }).catch((error) => { console.error(error); });
 
-    this.socketSubscription = this.socketService.on('chat').subscribe((data: any) => {
-      console.log('Received chat:', data);
-      // this.addChild(data);
+    this.socketService.emit('register', JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login').id);
+    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+      console.log('Received message:', data);
+      this.messages.push(data);
+      this.addNewMessage(data);
     });
   }
 
@@ -63,20 +85,70 @@ export class HomeComponent {
         console.log(this.chatList);
       });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const chatHistory = document.getElementById('chat-history') as HTMLElement;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    });
+  }
+
+  ngOnDestroy() {
+    // this.socketSubscription.unsubscribe();
+  }
+
+  onScroll(event: any) {
+    if (event.target.scrollTop === 0) {
+      const scrollMax = event.target.scrollTopMax;
+      console.log('Scroll max:', scrollMax);
+      console.log('Scrolled to top');
+      this.getChatHistory().forEach((message: any) => {
+        this.addOldMessage(message);
+      });
+      event.target.scrollTop = event.target.scrollTopMax - scrollMax;
+    }
   }
 
   sendMessage() {
     const chatBar = document.getElementById('chat-bar') as HTMLInputElement;
-    const message = chatBar.value;
-    chatBar.value = '';
-    chatBar.style.height = "1.2em";
-    console.log('Sending message:', message);
+    if (!this.activeChat || chatBar.value === '') {
+      chatBar.value = '';
+      chatBar.style.height = "1.2em";
+    } else {
+      const user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
+      const message = { message: chatBar.value, time: new Date().toLocaleString(), user_id: user.id, chat_id: this.activeChat?.chat.id, username: user.username };
+      chatBar.value = '';
+      chatBar.style.height = "1.2em";
 
-    this.socketService.emit('message', { message });
+
+      console.log('Sending message:', message);
+      this.socketService.emit('message', JSON.stringify(message));
+
+      this.addNewMessage(message);
+
+      const chatHistory = document.getElementById('chat-history') as HTMLElement;
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      this.activeChat.lastMessage = message;
+      this.refreshChatListItem(this.activeChat);
+    }
+  }
+
+  refreshChatListItem(chat: ChatListItemComponent) {
+    console.log(this.chatList);
+    console.log(document.getElementById('chat-list')?.childNodes);
+    const index = this.chatList.indexOf(chat);
+    if (index != this.chatList.length - 1) {
+      this.chatList.splice(index, 1);
+      this.chatList.push(this.activeChat);
+      const chatList = document.getElementById('chat-list') as HTMLElement;
+      const chatDom = chatList.childNodes[index]
+      chatList.removeChild(chatDom);
+      chatList.appendChild(chatDom);
+    }
   }
 
   openChat(openedChat?: ChatListItemComponent) {
-    this.socketSubscription.unsubscribe();
+    // this.socketSubscription.unsubscribe();
     console.log('Opening chat', openedChat);
     this.chatList.forEach((chat: ChatListItemComponent) => {
       if (chat !== openedChat) {
@@ -85,19 +157,29 @@ export class HomeComponent {
     });
     this.activeChat = openedChat;
 
-    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
-      console.log('Received message:', data);
-      this.messages.push(data);
-
-
-    });
+    // this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+    //   console.log('Received message:', data);
+    //   this.messages.push(data);
+    // });
 
     const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
-    chatInfo.innerText = openedChat?.chat.name || 'Chat Name';
-  }
+    chatInfo.innerText = openedChat?.chat.username || ' ';
 
-  ngOnDestroy() {
-    this.socketSubscription.unsubscribe();
+    const chatHistory = this.getChatHistory();
+
+    const oldChat = document.getElementById('old') as HTMLElement;
+    while (oldChat.childNodes[0] && oldChat.childNodes[0] instanceof HTMLElement) {
+      oldChat.removeChild(oldChat.childNodes[0]);
+    }
+
+    const newChat = document.getElementById('new') as HTMLElement;
+    while (newChat.childNodes[0] && newChat.childNodes[0] instanceof HTMLElement) {
+      newChat.removeChild(newChat.childNodes[0]);
+    }
+
+    chatHistory.forEach((message: any) => {
+      this.addOldMessage(message);
+    });
   }
 
   createChat() {
@@ -110,7 +192,9 @@ export class HomeComponent {
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'none';
 
-    this.addChild({ name: chatName });
+    // this.socketService.emit('create', { chatName });
+
+    this.addChatComponent({ id: 1, username: chatName }, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
   }
 
   openPopup() {
@@ -124,20 +208,42 @@ export class HomeComponent {
   }
 
   leaveChat() {
-    console.log('Leaving chat');
+    // console.log('Leaving chat');
+    // fetch('http://localhost:3000/leave?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString(), {
+    //   method: 'POST'
+    // }).then((response) => {
+    //   console.log('Left chat:', response);
+    //   window.location.reload();
+    // }).catch((error) => {
+    //   console.error(error);
+    // });
   }
 
-  getChatHistory() {
+  getChatHistory(start: number = 0, end: number = 10, chatId: number = this.activeChat?.chat.id) {
     console.log('Getting chat history');
-    fetch('http://localhost:3000/chat?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
-      response.json().then((data) => {
-        console.log('Chat history:', data);
-        data.forEach((message: any) => {
-          this.messages.push(message);
-        });
-      });
-    }).catch((error) => {
-      console.error(error);
-    });
+    const messages = [
+      { message: '1', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '2', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '3', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '4', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '5', time: new Date().toLocaleString(), username: 'User1' },
+
+      { message: '6', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '7', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '8', time: new Date().toLocaleString(), username: 'User1' },
+      { message: '9', time: new Date().toLocaleString(), username: 'User1' },
+    ];
+
+    return messages.reverse();
+    // fetch('http://localhost:3000/messages?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
+    //   response.json().then((data) => {
+    //     console.log('Chat history:', data);
+    //     data.forEach((message: any) => {
+    //       this.messages.push(message);
+    //     });
+    //   });
+    // }).catch((error) => {
+    //   console.error(error);
+    // });
   }
 }

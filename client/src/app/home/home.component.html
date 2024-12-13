@@ -1,11 +1,16 @@
 <div id="home">
     <div id="home-card" class="horizontal-split">
         <div class="left">
-            <div id="chat-manager">
-                <button id="new-chat" class="btn btn-primary" (click)="openPopup()">Neuer Chat</button>
+            <div id="chat-manager" class="horizontal-split">
+                <div class="left">
+                    <button id="new-chat" class="btn btn-primary" (click)="openPopup()">Neuer Chat</button>
+                </div>
+                <div class="right">
+                    <a href="/profile" class="btn btn-secondary">Profil</a>
+                </div>
             </div>
             <ul id="chat-list">
-                <ng-template #viewContainerRef></ng-template>
+                <ng-template #chatInsertPoint></ng-template>
             </ul>
         </div>
         <div class="right">
@@ -18,9 +23,13 @@
                 </div>
             </div>
             <div id="chat" class="bordered">
-                <div id="chat-history">
-                    <app-chat-message></app-chat-message>
-                    <app-chat-message></app-chat-message>
+                <div id="chat-history" (scroll)="onScroll($event)">
+                    <div id="old">
+                        <ng-template #oldInsertPoint></ng-template>
+                    </div>
+                    <div id="new">
+                        <ng-template #newInsertPoint></ng-template>
+                    </div>
                 </div>
                 <div id="chat-input">
                     <textarea id="chat-bar" placeholder="Type a message..."

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-profile',
@@ -9,11 +10,15 @@ import { Component } from '@angular/core';
 })
 export class ProfileComponent {
   ngOnInit() {
-    fetch('/api/profile')
-      .then(response => response.json())
-      .then(data => {
+    const token = localStorage.getItem('token');
+    console.log(token);
 
-      }).catch(error => { console.log(error); });
+    const decodedToken = jwtDecode(token? token : '');
+
+    console.log(decodedToken);
+
+    const username = document.getElementById('username') as HTMLInputElement;
+    username.value = 'John Doe';
 
     console.log('ProfileComponent initialized');
   }

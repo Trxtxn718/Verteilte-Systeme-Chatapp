@@ -27,13 +27,10 @@ app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'))
 })
 
-io.adapter(mqttAdapter(
-  {
-    host: 'mqtt://mqtt',
-    port: 1883
-  }
-));
 
+app.get('/chat', (req, res) => {
+  io.emit('chat', 'Hello from Server');
+})
 io.on('connection', (socket) => {
   console.log('user connected');
 
@@ -45,23 +42,59 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', async (msg) => {
-    console.log('MSG:')
-    console.log(msg);
-    console.log('MSG END')
     msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);
     const formatedMessage = await formatMessage(msgObj);
     console.log('Formated Message' + formatedMessage);
-    if (users[formatedMessage.receiver_id] != null) {
-      io.to(users[formatedMessage.receiver_id]).emit('message', JSON.stringify(formatedMessage));
-    }
-    else {
-      console.log(`User ${formatedMessage.receiver_id} not online`);
-      mqttClient.publish('VSChatMessage/topic', JSON.stringify(formatedMessage));
-    }
+    mqttClient.publish('VSChatMessage/topic', JSON.stringify(formatedMessage));
+
   });
 
+  socket.on('chat', async (chat) => {
+    chat = JSON.parse(chat);
+    console.log('Chat:' + chat);
+    console.log('Chat:' + chat.user_id);
+    const user = await fetch(`http://nginx:80/backend/users/getUserByUsername/${chat.target_user}`);
+    console.log(user);
+    const userJson = await user.json();
+    console.log(userJson);
+    const chatObj = {
+      user_1: chat.user_id,
+      user_2: userJson.id
+    };
+    const newChat = await (await fetch('http://nginx:80/backend/chats/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(chatObj)
+    })).json();
+    const payload = {
+      receiver_id: chat.user_id,
+      chat: newChat,
+      user1: {
+        id: chat.user_id,
+        username: await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json().username
+      },
+      user2: {
+        id: userJson.id,
+        username: userJson.username
+      }
+    };
+    mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
+    payload.receiver_id = userJson.id;
+    mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
+  });
+
+
   socket.on('disconnect', () => {
+    const userId = Object.keys(users).find((key) => users[key] === socket.id);
+
+    if (userId) {
+      delete users[userId]; // Entferne den Benutzer aus dem Objekt
+      console.log(`Nutzer abgemeldet: ${userId}`);
+    }
+    console.log("Users: " + users);
     console.log('user disconnected');
   });
 });
@@ -78,7 +111,14 @@ mqttClient.on('message', (topic, message) => {
   console.log(`MQTT Message received:${message.toString()}`);
   const messageObj = JSON.parse(message);
   if (users[messageObj.receiver_id] != null) {
-    io.to(users[messageObj.receiver_id]).emit('message', JSON.stringify(formatedMessage));
+    if (topic === 'VSChatMessage/topic') {
+      console.log('socket id: ' + users[messageObj.receiver_id]);
+      io.to(users[messageObj.receiver_id]).emit('message', JSON.stringify(messageObj));
+    }
+    else if (topic === 'VSChatCreation/topic') {
+      console.log('socket id: ' + users[messageObj.receiver_id]);
+      io.to(users[messageObj.receiver_id]).emit('chat', JSON.stringify(messageObj));
+    }
   }
   else {
     console.log(`User ${messageObj.receiver_id} not online`);
@@ -87,6 +127,7 @@ mqttClient.on('message', (topic, message) => {
 
 // Themen abonnieren
 mqttClient.subscribe('VSChatMessage/topic');
+mqttClient.subscribe('VSChatCreation/topic');
 
 
 server.listen(PORT, '0.0.0.0');

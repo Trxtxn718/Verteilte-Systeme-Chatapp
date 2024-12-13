@@ -56,6 +56,7 @@ export class HomeComponent {
 
     this.messageSubscription = this.socketService.on('message').subscribe((data: any) => {
       data = JSON.parse(data);
+      data.content = data.message;
       console.log('Received message:', data);
       const targetChat = this.chatList.filter((chat: ChatListItemComponent) => chat.chat.id === data.chat_id)[0]
       targetChat.lastMessage = data;
@@ -144,7 +145,8 @@ export class HomeComponent {
       chatBar.value = '';
       chatBar.style.height = "1.2em";
     } else {
-      const message = { content: chatBar.value, time: new Date().toLocaleString(), user_id: this.user.id, chat_id: this.activeChat?.chat.id, username: this.user.username };
+      console.log('Sending message', chatBar.value);
+      const message = { message: chatBar.value, content: chatBar.value, time: new Date().toLocaleString(), user_id: this.user.id, chat_id: this.activeChat?.chat.id, username: this.user.username };
       chatBar.value = '';
       chatBar.style.height = "1.2em";
 

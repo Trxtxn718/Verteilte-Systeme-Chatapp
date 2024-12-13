@@ -55,6 +55,7 @@ export class HomeComponent {
     this.socketService.emit('register', this.user.id);
 
     this.messageSubscription = this.socketService.on('message').subscribe((data: any) => {
+      data = JSON.parse(data);
       console.log('Received message:', data);
       const targetChat = this.chatList.filter((chat: ChatListItemComponent) => chat.chat.id === data.chat_id)[0]
       targetChat.lastMessage = data;
@@ -66,8 +67,17 @@ export class HomeComponent {
     });
 
     this.chatSubscription = this.socketService.on('chat').subscribe((data: any) => {
+      data = JSON.parse(data);
       console.log('Received chat:', data);
-      this.addChatComponent(data, { content: '', time: new Date().toLocaleString(), username: data.username });
+      let user;
+      if (data.user1.id === this.user.id) {
+        user = data.user2;
+      } else {
+        user = data.user1;
+      }
+
+      let chat = { id: data.chat.id, username: user.username };
+      this.addChatComponent(data.chat, { content: '', time: new Date().toLocaleString(), username: user.username });
     });
   }
 
@@ -93,6 +103,11 @@ export class HomeComponent {
       this.http.get(environment.backend + '/chats/user/' + this.user.id).subscribe((data: any) => {
         console.log('Chats:', data);
         data.forEach((chat: any) => {
+          if (!chat.lastMessage) {
+            chat.lastMessage = { content: '', time: new Date().toLocaleString(), username: chat.username };
+          } else {
+            chat.lastMessage.time = new Date(chat.lastMessage.time).toLocaleString();
+          }
           this.addChatComponent(chat.chat, chat.lastMessage);
         });
       });
@@ -182,15 +197,15 @@ export class HomeComponent {
     console.log('Creating chat');
     const input = document.getElementById('new-chat-input') as HTMLInputElement;
     const chatName = input.value;
-    console.log('Chat name:', chatName);
-    input.value = '';
+    if (chatName !== '') {
+      console.log('Chat name:', chatName);
+      input.value = '';
 
-    const popup = document.getElementById('new-chat-popup') as HTMLElement;
-    popup.style.display = 'none';
+      const popup = document.getElementById('new-chat-popup') as HTMLElement;
+      popup.style.display = 'none';
 
-    // this.socketService.emit('create', { chatName });
-
-    this.addChatComponent({ id: 1, username: chatName }, { content: '1', time: new Date().toLocaleString(), username: 'User1' });
+      this.socketService.emit('chat', JSON.stringify({ user_id: this.user.id, target_user: chatName }));
+    }
   }
 
   openPopup() {

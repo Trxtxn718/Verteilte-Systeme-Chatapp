@@ -7,8 +7,10 @@ export async function formatMessage(message) {
         sender_id: message.sender_id,
         receiver_id: receiver.id,
         message: message.message,
-        timestamp: message.timestamp,
-        receiver_username: receiver.username
+        time: message.time,
+        receiver_username: receiver.username,
+        chat_id: message.chat_id,
+        username: message.username
     }
 }
 
@@ -21,7 +23,9 @@ async function getReceiver(message) {
     const chat = await (await fetch('http://nginx:80/backend/chats/' + message.chat_id)).json();
 
     console.log('Chat:', chat);
-    if (chat.user_1 == message.sender_id) {
+    console.log("boolean", chat.user_1 == message.user_id)
+    console.log(chat.user_1+ "==" +  message.user_id)
+    if (chat.user_1 == message.user_id) {
         return {id : chat.user_2, username: await getReceiverUsername(chat.user_2)};
     } else {
         return {id : chat.user_1, username: await getReceiverUsername(chat.user_1)};

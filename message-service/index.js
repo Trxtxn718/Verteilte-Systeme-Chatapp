@@ -69,18 +69,22 @@ io.on('connection', (socket) => {
       },
       body: JSON.stringify(chatObj)
     })).json();
+    const username = await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json()
+    console.log('Username: ');
+    console.log(username.username)
     const payload = {
       receiver_id: chat.user_id,
       chat: newChat,
       user1: {
         id: chat.user_id,
-        username: await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json().username
+        username: username.username
       },
       user2: {
         id: userJson.id,
         username: userJson.username
       }
     };
+    console.log( payload);
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
     payload.receiver_id = userJson.id;
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));

@@ -61,7 +61,8 @@ CREATE TABLE `Messages` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `chat_id` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL,
-  `content` text NOT NULL
+  `content` text NOT NULL,
+  `time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
@@ -85,7 +86,10 @@ CREATE TABLE `Users` (
 --
 
 INSERT INTO `Users` (`id`, `email`, `username`, `password`, `profile_img`, `created`, `updated`) VALUES
-(1, 't.t@t.de', 'Tristan', '1234', 'test_img', '2020-04-09 12:18:07', '2020-04-09 12:18:07');
+(1, 't.t@t.de', 'Tristan', 'NOT_HASHED', 'NO_IMG', '2024-12-12T23:27:56.582Z', '2024-12-12T23:27:56.582Z');
+
+INSERT INTO `Users` (`id`, `email`, `username`, `password`, `profile_img`, `created`, `updated`) VALUES
+(2, 'r@r.de', 'Robin', 'NOT_HASTED', 'NO_IMG', '2024-12-12T23:27:56.582Z', '2024-12-12T23:27:56.582Z');
 
 --
 -- Indizes der exportierten Tabellen

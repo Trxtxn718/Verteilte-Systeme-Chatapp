@@ -40,6 +40,10 @@ Messages.init(
         content: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        time: {
+            type: DataTypes.DATE,
+            allowNull: false
         }
     },
     {

@@ -3,6 +3,8 @@ import { ChatListItemComponent } from '../chat-list-item/chat-list-item.componen
 import { ChatMessageComponent } from '../chat-message/chat-message.component';
 import { Subscription } from 'rxjs';
 import { SocketService } from '../socket.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environment';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +14,9 @@ import { SocketService } from '../socket.service';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  private socketSubscription: Subscription;
+  private messageSubscription: Subscription;
+  private chatSubscription: Subscription;
+  private user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
   activeChat?: ChatListItemComponent;
   messages: any[] = [];
   chatList: any[] = [];
@@ -27,7 +31,7 @@ export class HomeComponent {
 
   @ViewChild(ChatListItemComponent) chatListItem!: ChatListItemComponent;
 
-  addChatComponent(chat: any, message: any) {
+  addChatComponent(chat: any, message?: any) {
     this.cipRef = this.cip.createComponent(ChatListItemComponent);
     this.cipRef.instance.updateStatus.subscribe((event: ChatListItemComponent) => { this.openChat(event); });
     this.cipRef.instance.chat = chat;
@@ -38,33 +42,44 @@ export class HomeComponent {
   addOldMessage(data: any) {
     this.oipRef = this.oip.createComponent(ChatMessageComponent);
     this.oipRef.instance.message = data;
-
-    this.oldMessagesList.push(this.cipRef.instance);
+    this.oldMessagesList.push(this.oipRef.instance);
   }
 
   addNewMessage(data: any) {
     this.nipRef = this.nip.createComponent(ChatMessageComponent);
     this.nipRef.instance.message = data;
-    this.newMessagesList.push(this.cipRef.instance);
+    this.newMessagesList.push(this.nipRef.instance);
   }
 
-  constructor(private socketService: SocketService) {
-    // get all chats
-    // this.addChild({ id: 1, name: 'Chat 1' });
-    // fetch('http://localhost:3000/chats?id=' /* + userid */).then((response) => {
-    //   response.json().then((data) => {
-    //     console.log('Chats:', data);
-    //     data.forEach((chat: any) => {
-    //       // this.addChild(chat);
-    //     });
-    //   });
-    // }).catch((error) => { console.error(error); });
+  constructor(private http: HttpClient, private socketService: SocketService) {
+    this.socketService.emit('register', this.user.id);
 
-    this.socketService.emit('register', JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login').id);
-    this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
+    this.messageSubscription = this.socketService.on('message').subscribe((data: any) => {
+      data = JSON.parse(data);
+      data.content = data.message;
       console.log('Received message:', data);
-      this.messages.push(data);
-      this.addNewMessage(data);
+      const targetChat = this.chatList.filter((chat: ChatListItemComponent) => chat.chat.id === data.chat_id)[0]
+      targetChat.lastMessage = data;
+      this.refreshChatListItem(targetChat);
+
+      if (this.activeChat?.chat.id === data.chat_id) {
+        this.addNewMessage(data);
+      }
+    });
+
+    this.chatSubscription = this.socketService.on('chat').subscribe((data: any) => {
+      data = JSON.parse(data);
+      console.log('Received chat:', data);
+      let user;
+      if (data.user1.id === this.user.id) {
+        user = data.user2;
+      } else {
+        user = data.user1;
+      }
+      console.log('User:', user);
+      console.log('Chat:', data.chat);
+      let chat = { id: data.chat.id, username: user.username };
+      this.addChatComponent(chat, { content: '', time: new Date().toLocaleString(), username: user.username });
     });
   }
 
@@ -87,6 +102,19 @@ export class HomeComponent {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      this.http.get(environment.backend + '/chats/user/' + this.user.id).subscribe((data: any) => {
+        console.log('Chats:', data);
+        data.forEach((chat: any) => {
+          if (!chat.lastMessage) {
+            chat.lastMessage = { content: '', time: new Date().toLocaleString(), username: chat.username };
+          } else {
+            chat.lastMessage.time = new Date(chat.lastMessage.time).toLocaleString();
+          }
+          this.addChatComponent(chat.chat, chat.lastMessage);
+        });
+      });
+
+
       const chatHistory = document.getElementById('chat-history') as HTMLElement;
       chatHistory.scrollTop = chatHistory.scrollHeight;
     });
@@ -101,10 +129,11 @@ export class HomeComponent {
       const scrollMax = event.target.scrollTopMax;
       console.log('Scroll max:', scrollMax);
       console.log('Scrolled to top');
-      this.getChatHistory().forEach((message: any) => {
-        this.addOldMessage(message);
-      });
-      event.target.scrollTop = event.target.scrollTopMax - scrollMax;
+      console.log('Old messages:', this.oldMessagesList);
+      if (this.oldMessagesList.length > 0) {
+        this.getChatHistory(this.oldMessagesList[this.oldMessagesList.length - 1].message.id);
+        event.target.scrollTop = event.target.scrollTopMax - scrollMax;
+      }
     }
   }
 
@@ -114,8 +143,8 @@ export class HomeComponent {
       chatBar.value = '';
       chatBar.style.height = "1.2em";
     } else {
-      const user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
-      const message = { message: chatBar.value, time: new Date().toLocaleString(), user_id: user.id, chat_id: this.activeChat?.chat.id, username: user.username };
+      console.log('Sending message', chatBar.value);
+      const message = { message: chatBar.value, content: chatBar.value, time: new Date().toLocaleString(), user_id: this.user.id, chat_id: this.activeChat?.chat.id, username: this.user.username };
       chatBar.value = '';
       chatBar.style.height = "1.2em";
 
@@ -157,44 +186,30 @@ export class HomeComponent {
     });
     this.activeChat = openedChat;
 
-    // this.socketSubscription = this.socketService.on('message').subscribe((data: any) => {
-    //   console.log('Received message:', data);
-    //   this.messages.push(data);
-    // });
-
     const chatInfo = document.getElementById('chat-info-name') as HTMLElement;
-    chatInfo.innerText = openedChat?.chat.username || ' ';
+    chatInfo.innerText = openedChat?.chat.username || '';
 
-    const chatHistory = this.getChatHistory();
+    this.clearChatHistory();
 
-    const oldChat = document.getElementById('old') as HTMLElement;
-    while (oldChat.childNodes[0] && oldChat.childNodes[0] instanceof HTMLElement) {
-      oldChat.removeChild(oldChat.childNodes[0]);
-    }
+    this.getChatHistory();
 
-    const newChat = document.getElementById('new') as HTMLElement;
-    while (newChat.childNodes[0] && newChat.childNodes[0] instanceof HTMLElement) {
-      newChat.removeChild(newChat.childNodes[0]);
-    }
-
-    chatHistory.forEach((message: any) => {
-      this.addOldMessage(message);
-    });
+    const chatHistory = document.getElementById('chat-history') as HTMLElement;
+    chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 
   createChat() {
     console.log('Creating chat');
     const input = document.getElementById('new-chat-input') as HTMLInputElement;
     const chatName = input.value;
-    console.log('Chat name:', chatName);
-    input.value = '';
+    if (chatName !== '') {
+      console.log('Chat name:', chatName);
+      input.value = '';
 
-    const popup = document.getElementById('new-chat-popup') as HTMLElement;
-    popup.style.display = 'none';
+      const popup = document.getElementById('new-chat-popup') as HTMLElement;
+      popup.style.display = 'none';
 
-    // this.socketService.emit('create', { chatName });
-
-    this.addChatComponent({ id: 1, username: chatName }, { message: '1', time: new Date().toLocaleString(), username: 'User1' });
+      this.socketService.emit('chat', JSON.stringify({ user_id: this.user.id, target_user: chatName }));
+    }
   }
 
   openPopup() {
@@ -219,31 +234,30 @@ export class HomeComponent {
     // });
   }
 
-  getChatHistory(start: number = 0, end: number = 10, chatId: number = this.activeChat?.chat.id) {
+  clearChatHistory() {
+    const oldChat = document.getElementById('old') as HTMLElement;
+    while (oldChat.childNodes[0] && oldChat.childNodes[0] instanceof HTMLElement) {
+      oldChat.removeChild(oldChat.childNodes[0]);
+    }
+    this.oldMessagesList = [];
+
+    const newChat = document.getElementById('new') as HTMLElement;
+    while (newChat.childNodes[0] && newChat.childNodes[0] instanceof HTMLElement) {
+      newChat.removeChild(newChat.childNodes[0]);
+    }
+
+    this.newMessagesList = [];
+  }
+
+  getChatHistory(max_id: number = 0, limit: number = 20, chatId: number = this.activeChat?.chat.id) {
     console.log('Getting chat history');
-    const messages = [
-      { message: '1', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '2', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '3', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '4', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '5', time: new Date().toLocaleString(), username: 'User1' },
 
-      { message: '6', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '7', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '8', time: new Date().toLocaleString(), username: 'User1' },
-      { message: '9', time: new Date().toLocaleString(), username: 'User1' },
-    ];
-
-    return messages.reverse();
-    // fetch('http://localhost:3000/messages?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString()).then((response) => {
-    //   response.json().then((data) => {
-    //     console.log('Chat history:', data);
-    //     data.forEach((message: any) => {
-    //       this.messages.push(message);
-    //     });
-    //   });
-    // }).catch((error) => {
-    //   console.error(error);
-    // });
+    this.http.get(environment.backend + '/messages/chat/' + chatId + '?max_id=' + max_id + '&limit=' + limit).subscribe((data: any) => {
+      console.log('Chat history:', data);
+      data.forEach((message: any) => {
+        message.time = new Date(message.time).toLocaleString();
+        this.addOldMessage(message);
+      });
+    });
   }
 }

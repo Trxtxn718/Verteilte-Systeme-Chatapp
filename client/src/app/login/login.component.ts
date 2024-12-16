@@ -18,6 +18,7 @@ export class LoginComponent {
 
     console.log(email.value, password.value);
 
+    // Attempt to login the user
     this.http.post<any>(environment.backend + '/users/login', {
       email: email.value,
       password: password.value,

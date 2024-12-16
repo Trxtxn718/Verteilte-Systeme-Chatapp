@@ -76,6 +76,7 @@ io.on('connection', (socket) => {
       })).json();
     } catch (error) {
       console.log(error);
+      return;
     }
     const username = await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json()
     const payload = {

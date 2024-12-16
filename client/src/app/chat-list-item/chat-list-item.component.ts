@@ -18,6 +18,7 @@ export class ChatListItemComponent {
   active: boolean = false;
 
   constructor() {
+    // If no chat or lastMessage is provided, create a placeholder
     if (!this.chat) {
       this.chat = { id: 1, username: 'Anonymous' };
     }
@@ -32,6 +33,7 @@ export class ChatListItemComponent {
   }
 
   clicked() {
+    // Emit an event to update the status of the chat list item
     console.log('ChatListItemComponent clicked');
     this.active = true;
     this.updateStatus.emit(this);

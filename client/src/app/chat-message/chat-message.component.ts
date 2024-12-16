@@ -11,6 +11,7 @@ export class ChatMessageComponent {
   @Input() message?: any;
 
   constructor() {
+    // If no message is provided, create a placeholder
     if (!this.message) {
       this.message = { time: new Date().toLocaleString(), content: 'Placeholder message' };
     } else {

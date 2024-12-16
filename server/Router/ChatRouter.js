@@ -7,6 +7,7 @@ const { Messages } = require('../models/Messages');
 
 const { Op } = require('sequelize');
 
+// Get all chats
 router.get('/', (req, res) => {
     DirectChats.findAll().then(chats => {
         res.status(200).json(chats);
@@ -15,7 +16,7 @@ router.get('/', (req, res) => {
         res.status(500).json(err);
     });
 });
-
+// Get a chat by id
 router.get('/:id', (req, res) => {
     DirectChats.findByPk(req.params.id).then(chat => {
         res.status(200).json(chat);
@@ -25,6 +26,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// Get all chats for a user
 router.get('/user/:id', async (req, res) => {
     try {
         let answer = [];
@@ -33,12 +35,9 @@ router.get('/user/:id', async (req, res) => {
             let user;
             if (chat.user_1 == req.params.id) {
                 user = await Users.findByPk(chat.user_2)
-                // console.log(user);
             } else {
                 user = await Users.findByPk(chat.user_1)
-                // console.log(user);
             }
-            // answer.push({ chat: { id: chat.id, username: user.dataValues.username } });
 
             let lastMessage = await Messages.findOne({ where: { chat_id: chat.id }, order: [['time', 'DESC']] });
             console.log(lastMessage);
@@ -50,7 +49,7 @@ router.get('/user/:id', async (req, res) => {
         res.status(500).json(err);
     }
 });
-
+// Create a new chat
 router.post('/', (req, res) => {
     const user1 = Users.findByPk(req.body.user_1);
     const user2 = Users.findByPk(req.body.user_2);

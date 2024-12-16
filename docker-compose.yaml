@@ -31,10 +31,6 @@ services:
     environment:
       - PORT=8081
     restart: always
-    # links:
-    #   - backend
-    # depends_on:
-    #   - backend
     networks:
       - loadbalancing
   
@@ -45,8 +41,6 @@ services:
       mode: replicated
       endpoint_mode: vip
     restart: always
-    # ports:
-    #   - "4200:80"
     networks:
       - loadbalancing
 

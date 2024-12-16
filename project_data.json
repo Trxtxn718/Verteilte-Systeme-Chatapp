@@ -1,0 +1,6 @@
+{
+  "thema": "Chatapp",
+  "kurs": "TINF22F",
+  "teilnehmer": "Robin Ernst (9652042), Tristan Kopp (4134171)",
+  "kurzbeschreibung": "Kurzbeschreibung: Chatapp für Kommunikation in Direktnachrichten oder Gruppenchats. Erstellung und Bearbeitung von User-Accounts. Features:- Loadbalancing - Echtzeitübertragung (Websockets, ...)"
+}

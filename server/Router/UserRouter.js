@@ -5,8 +5,6 @@ const crypto = require('crypto');
 
 const { Users } = require('../models/Users');
 
-// Try to get all users !!!DEBUG!!!
-// TODO delete
 router.get('/', async (req, res) => {
     Users.findAll().then(users => {
         res.status(200).json(users);
@@ -26,6 +24,7 @@ router.get('/:id', async (req, res) => {
     });
 });
 
+// Try to get user information of user with username
 router.get('/getUserByUsername/:username', (req, res) => {
     Users.findOne({ where: { username: req.params.username } }).then(user => {
         res.status(200).json(user);

@@ -10,6 +10,8 @@ const { formatMessage } = require("./message.service");
 
 const app = express();
 const server = createServer(app);
+
+// Start socket.io server
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -18,21 +20,31 @@ const io = new Server(server, {
   },
 });
 
+// Connect to MQTT-Broker
+const mqttClient = mqtt.connect('mqtt://mqtt-broker:1883');
+console.log('Start connecting to MQTT-Broker');
+mqttClient.on('connect', () => {
+  console.log('MQTT-Client connected to MQTT-Broker');
+});
+
+
+
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || '127.0.0.1'
 
 const users = {};
 
 io.on('connection', (socket) => {
-  console.log('user connected');
+  console.log(' Auser connected');
 
-  //TODO Check if user is registered
+  // Register user with socket id
   socket.on('register', (userId) => {
     console.log(`User ${userId} registered`);
     users[userId] = socket.id;
     console.log(users);
   });
 
+  // Receive message from client
   socket.on('message', async (msg) => {
     msgObj = await JSON.parse(msg);
     console.log(`Message received: ${msgObj.message}`);
@@ -42,10 +54,9 @@ io.on('connection', (socket) => {
 
   });
 
+  // Receive new chat from client
   socket.on('chat', async (chat) => {
     chat = JSON.parse(chat);
-    console.log('Chat:' + chat);
-    console.log('Chat:' + chat.user_id);
     const user = await fetch(`http://nginx:80/backend/users/getUserByUsername/${chat.target_user}`);
     console.log(user);
     const userJson = await user.json();
@@ -68,8 +79,6 @@ io.on('connection', (socket) => {
       return;
     }
     const username = await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json()
-    console.log('Username: ');
-    console.log(username.username)
     const payload = {
       receiver_id: chat.user_id,
       chat: newChat,
@@ -83,17 +92,18 @@ io.on('connection', (socket) => {
       }
     };
     console.log(payload);
+    // Send new chat to both users
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
     payload.receiver_id = userJson.id;
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
   });
 
-
+  // Handle disconnect from client
   socket.on('disconnect', () => {
     const userId = Object.keys(users).find((key) => users[key] === socket.id);
 
     if (userId) {
-      delete users[userId]; // Entferne den Benutzer aus dem Objekt
+      delete users[userId]; 
       console.log(`Nutzer abgemeldet: ${userId}`);
     }
     console.log("Users: " + users);
@@ -102,21 +112,19 @@ io.on('connection', (socket) => {
 });
 
 
-const mqttClient = mqtt.connect('mqtt://mqtt-broker:1883');
-console.log('MQTT-Client connecting to HiveMQ');
-mqttClient.on('connect', () => {
-  console.log('MQTT-Client connected to MQTT-Broker');
-  mqttClient.publish('test/topic', 'Hello from Websocket!');
-});
 
+// Receive messages from other sockets
 mqttClient.on('message', (topic, message) => {
   console.log(`MQTT Message received:${message.toString()}`);
   const messageObj = JSON.parse(message);
   if (users[messageObj.receiver_id] != null) {
+
+    // Send message to receiver
     if (topic === 'VSChatMessage/topic') {
       console.log('socket id: ' + users[messageObj.receiver_id]);
       io.to(users[messageObj.receiver_id]).emit('message', JSON.stringify(messageObj));
     }
+    // Send new chat to receiver
     else if (topic === 'VSChatCreation/topic') {
       console.log('socket id: ' + users[messageObj.receiver_id]);
       io.to(users[messageObj.receiver_id]).emit('chat', JSON.stringify(messageObj));
@@ -127,7 +135,7 @@ mqttClient.on('message', (topic, message) => {
   }
 });
 
-// Themen abonnieren
+// Subscribe to topics
 mqttClient.subscribe('VSChatMessage/topic');
 mqttClient.subscribe('VSChatCreation/topic');
 

@@ -5,6 +5,7 @@ const { Messages } = require('../models/Messages');
 const { Users } = require('../models/Users');
 const { Op } = require('sequelize');
 
+// Get all messages
 router.get('/', (req, res) => {
     Messages.findAll().then(messages => {
         res.status(200).json(messages);
@@ -14,6 +15,7 @@ router.get('/', (req, res) => {
     });
 });
 
+// Get a message by id
 router.get('/:id', (req, res) => {
     Messages.findByPk(req.params.id).then(message => {
         res.status(200).json(message);
@@ -23,6 +25,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// Create a new message
 router.post('/', (req, res) => {
     req.body.time = new Date().toISOString();
     Messages.create(req.body).then(message => {
@@ -32,7 +35,7 @@ router.post('/', (req, res) => {
         res.status(500).json(err);
     });
 });
-
+// Get all messages for a chat
 router.get('/chat/:id', async (req, res) => {
     let max_id = req.query.max_id ? req.query.max_id : 0;
     let limit = req.query.limit ? Number(req.query.limit) : 20;
@@ -43,15 +46,8 @@ router.get('/chat/:id', async (req, res) => {
             let messages = await Messages.findAll({ limit: limit, where: { chat_id: req.params.id, id: { [Op.lt]: max_id } }, order: [["id", "DESC"]] })
             for (let message of messages) {
                 let user = await Users.findByPk(message.user_id);
-                // console.log(user);
                 answer.push({ id: message.dataValues.id, username: user.dataValues.username, time: message.dataValues.time, content: message.dataValues.content });
             }
-
-            // messages.forEach(message => {
-            //     let user = await Users.findByPk(message.user_id);
-            //     console.log(user);
-            //     answer.push({ username: user.dataValues.username, time: message.dataValues.time, content: message.dataValues.content });
-            // });
 
             res.status(200).json(answer);
         } catch (err) {
@@ -63,14 +59,8 @@ router.get('/chat/:id', async (req, res) => {
             let messages = await Messages.findAll({ limit: limit, where: { chat_id: req.params.id }, order: [["id", "DESC"]] })
             for (let message of messages) {
                 let user = await Users.findByPk(message.user_id);
-                // console.log(user);
                 answer.push({ id: message.dataValues.id, username: user.dataValues.username, time: message.dataValues.time, content: message.dataValues.content });
             }
-            // messages.forEach(message => {
-            //     let user = await Users.findByPk(message.user_id);
-            //     console.log(user);
-            //     answer.push({ username: user.dataValues.username, time: message.dataValues.time, content: message.dataValues.content });
-            // });
             res.status(200).json(answer);
         } catch (err) {
             console.error(err);

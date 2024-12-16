@@ -23,14 +23,6 @@ const HOST = process.env.HOST || '127.0.0.1'
 
 const users = {};
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'))
-})
-
-
-app.get('/chat', (req, res) => {
-  io.emit('chat', 'Hello from Server');
-})
 io.on('connection', (socket) => {
   console.log('user connected');
 

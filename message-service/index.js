@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
 });
 
 
-const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
+const mqttClient = mqtt.connect('mqtt://mqtt-broker:1883');
 console.log('MQTT-Client connecting to HiveMQ');
 mqttClient.on('connect', () => {
   console.log('MQTT-Client connected to MQTT-Broker');

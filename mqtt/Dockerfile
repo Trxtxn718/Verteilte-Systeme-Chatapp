@@ -1,4 +1,6 @@
 FROM eclipse-mosquitto
+
+# Standard Mosquitto Port expose
 EXPOSE 1883
 
-CMD ["/usr/sbin/mosquitto", "-c", "/mosquitto/config/mosquitto.conf"]
+# Kopiere die Konfigurationsdatei relativ zur Dockerfile in den Container

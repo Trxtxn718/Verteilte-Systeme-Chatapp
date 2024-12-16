@@ -23,14 +23,6 @@ const HOST = process.env.HOST || '127.0.0.1'
 
 const users = {};
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'))
-})
-
-
-app.get('/chat', (req, res) => {
-  io.emit('chat', 'Hello from Server');
-})
 io.on('connection', (socket) => {
   console.log('user connected');
 
@@ -62,13 +54,18 @@ io.on('connection', (socket) => {
       user_1: chat.user_id,
       user_2: userJson.id
     };
-    const newChat = await (await fetch('http://nginx:80/backend/chats/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(chatObj)
-    })).json();
+    let newChat;
+    try {
+      newChat = await (await fetch('http://nginx:80/backend/chats/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(chatObj)
+      })).json();
+    } catch (error) {
+      console.log(error);
+    }
     const username = await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json()
     console.log('Username: ');
     console.log(username.username)
@@ -84,7 +81,7 @@ io.on('connection', (socket) => {
         username: userJson.username
       }
     };
-    console.log( payload);
+    console.log(payload);
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
     payload.receiver_id = userJson.id;
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
@@ -104,7 +101,7 @@ io.on('connection', (socket) => {
 });
 
 
-const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
+const mqttClient = mqtt.connect('mqtt://mqtt-broker:1883');
 console.log('MQTT-Client connecting to HiveMQ');
 mqttClient.on('connect', () => {
   console.log('MQTT-Client connected to MQTT-Broker');

@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { SocketService } from '../socket.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment';
+import { jwtDecode } from 'jwt-decode';
+import cookieParser from 'cookie-parser';
 
 @Component({
   selector: 'app-home',
@@ -114,6 +116,7 @@ export class HomeComponent {
         });
       });
 
+      console.log('Cookies:', document.cookie);
 
       const chatHistory = document.getElementById('chat-history') as HTMLElement;
       chatHistory.scrollTop = chatHistory.scrollHeight;

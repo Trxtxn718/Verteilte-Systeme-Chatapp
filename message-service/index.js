@@ -62,13 +62,18 @@ io.on('connection', (socket) => {
       user_1: chat.user_id,
       user_2: userJson.id
     };
-    const newChat = await (await fetch('http://nginx:80/backend/chats/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(chatObj)
-    })).json();
+    let newChat;
+    try {
+      newChat = await (await fetch('http://nginx:80/backend/chats/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(chatObj)
+      })).json();
+    } catch (error) {
+      console.log(error);
+    }
     const username = await (await fetch(`http://nginx:80/backend/users/${chat.user_id}`)).json()
     console.log('Username: ');
     console.log(username.username)
@@ -84,7 +89,7 @@ io.on('connection', (socket) => {
         username: userJson.username
       }
     };
-    console.log( payload);
+    console.log(payload);
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));
     payload.receiver_id = userJson.id;
     mqttClient.publish('VSChatCreation/topic', JSON.stringify(payload));

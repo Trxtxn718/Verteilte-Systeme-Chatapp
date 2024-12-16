@@ -42,7 +42,7 @@ router.get('/user/:id', async (req, res) => {
 
             let lastMessage = await Messages.findOne({ where: { chat_id: chat.id }, order: [['time', 'DESC']] });
             console.log(lastMessage);
-            answer.push({ chat: {id: chat.id, username: user.dataValues.username}, lastMessage: lastMessage });
+            answer.push({ chat: { id: chat.id, username: user.dataValues.username }, lastMessage: lastMessage });
         }
         res.status(200).json(answer);
     } catch (err) {
@@ -52,6 +52,20 @@ router.get('/user/:id', async (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    const user1 = Users.findByPk(req.body.user_1);
+    const user2 = Users.findByPk(req.body.user_2);
+
+    if (user1 == null || user2 == null) {
+        res.status(400).json({ message: "User not found." });
+        return;
+    }
+
+    const chats = DirectChats.findAll({ where: { [Op.or]: [{ user_1: req.body.user_1, user_2: req.body.user_2 }, { user_1: req.body.user_2, user_2: req.body.user_1 }] } });
+    if (chats.length > 0) {
+        res.status(409).json({ message: "Chat already exists." });
+        return;
+    }
+
     DirectChats.create(req.body).then(chat => {
         res.status(201).json(chat);
     }).catch(err => {

@@ -14,11 +14,13 @@ export class RegisterComponent {
   constructor(private http: HttpClient, private socket: SocketService) { }
 
   sendForm() {
+    // Get the form data
     const username = document.getElementById('username') as HTMLInputElement;
     const email = document.getElementById('email') as HTMLInputElement;
     const password = document.getElementById('password') as HTMLInputElement;
     const passwordRepeat = document.getElementById('passwordRepeat') as HTMLInputElement;
 
+    // Attempt to register the user
     this.http.post<any>(environment.backend + '/users/register', {
       username: username.value,
       email: email.value,

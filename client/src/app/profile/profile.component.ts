@@ -9,6 +9,8 @@ import { jwtDecode } from 'jwt-decode';
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent {
+
+  // Set the username input field to the username from the token
   ngOnInit() {
     const token = localStorage.getItem('token');
     console.log(token);

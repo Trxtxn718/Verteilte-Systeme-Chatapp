@@ -9,7 +9,7 @@ import { environment } from '../../environment';
 export class SocketService {
   private socket: Socket;
 
-
+  // Create a new socket connection
   constructor() {
     this.socket = io(environment.ws, {
       path: '/socket.io',
@@ -18,10 +18,12 @@ export class SocketService {
     });
   }
 
+  // Handle emitting events
   emit(event: string, data: any) {
     this.socket.emit(event, data);
   }
 
+  // Handle listening for events
   on(event: string): Observable<any> {
     return new Observable<any>(observer => {
       this.socket.on(event, (data: any) => observer.next(data));

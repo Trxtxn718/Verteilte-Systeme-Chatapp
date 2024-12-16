@@ -1,3 +1,4 @@
+// Format message to include all necessary information
 export async function formatMessage(message) {
     console.log(`Message received: ${message}`);
     const receiver = await getReceiver(message);

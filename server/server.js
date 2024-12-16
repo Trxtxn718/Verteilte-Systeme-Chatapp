@@ -14,22 +14,18 @@ const { DirectChats } = require('./models/DirectChats');
 const UserRouter = require('./Router/UserRouter');
 const ChatRouter = require('./Router/ChatRouter');
 const MessageRouter = require('./Router/MessageRouter');
-// Constants
+
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
-// App
 const app = express();
-// app.use(cors());
-// app.use(cors({
-//     origin: ['http://localhost:4200'],
-//     credentials: true
-// }));
+
+
+// Enable CORS
 var corsOptions = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-    // res.header('Access-Control-Allow-Credentials', true);
     if (req.method === 'OPTIONS') {
         res.send(200);
     }
@@ -72,20 +68,7 @@ app.use('/static', express.static('public'))
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
-// Routes
+// Routers
 app.use('/users', UserRouter);
 app.use('/chats', ChatRouter);
 app.use('/messages', MessageRouter);
-
-app.get('/', (req, res) => {
-    res.send('Hello World');
-});
-app.post('/', (req, res) => {
-    console.log("Recieved request");
-    res.json({message: 'Hello World'});
-});
-
-// Start database connection
-const sleep = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
-}

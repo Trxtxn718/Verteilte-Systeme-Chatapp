@@ -18,7 +18,8 @@ import cookieParser from 'cookie-parser';
 export class HomeComponent {
   private messageSubscription: Subscription;
   private chatSubscription: Subscription;
-  private user = JSON.parse(localStorage.getItem('user') ? localStorage.getItem('user')! : window.location.href = '/login');
+  private connectSubscription: Subscription;
+  private user: any;
   activeChat?: ChatListItemComponent;
   messages: any[] = [];
   chatList: any[] = [];
@@ -54,7 +55,11 @@ export class HomeComponent {
   }
 
   constructor(private http: HttpClient, private socketService: SocketService) {
-    this.socketService.emit('register', this.user.id);
+    this.checkLogin();
+    this.connectSubscription = this.socketService.on('connect').subscribe(() => {
+      console.log('Connected to server');
+      this.socketService.emit('register', this.user.id);
+    });
 
     this.messageSubscription = this.socketService.on('message').subscribe((data: any) => {
       data = JSON.parse(data);
@@ -78,14 +83,13 @@ export class HomeComponent {
       } else {
         user = data.user1;
       }
-      console.log('User:', user);
-      console.log('Chat:', data.chat);
       let chat = { id: data.chat.id, username: user.username };
       this.addChatComponent(chat, { content: '', time: new Date().toLocaleString(), username: user.username });
     });
   }
 
   ngOnInit() {
+    this.checkLogin();
     const chatBar = document.getElementById('chat-bar') as HTMLInputElement;
     if (chatBar) {
       chatBar.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -96,14 +100,11 @@ export class HomeComponent {
       });
     }
 
-    const chatList = document.getElementById('chat-list') as HTMLElement;
-    if (chatList) {
-      chatList.addEventListener('click', (event: MouseEvent) => {
-        console.log(this.chatList);
-      });
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
+      this.checkLogin();
+      if (!this.user) {
+        return;
+      }
       this.http.get(environment.backend + '/chats/user/' + this.user.id).subscribe((data: any) => {
         console.log('Chats:', data);
         data.forEach((chat: any) => {
@@ -116,8 +117,6 @@ export class HomeComponent {
         });
       });
 
-      console.log('Cookies:', document.cookie);
-
       const chatHistory = document.getElementById('chat-history') as HTMLElement;
       chatHistory.scrollTop = chatHistory.scrollHeight;
     });
@@ -127,12 +126,34 @@ export class HomeComponent {
     // this.socketSubscription.unsubscribe();
   }
 
+  checkLogin() {
+    try {
+      let userString = localStorage.getItem('user');
+      if (userString === null || userString === undefined || userString === '') {
+        window.location.href = '/login';
+      } else {
+        this.user = JSON.parse(userString);
+      }
+      this.http.get(environment.backend + '/users/' + this.user.id, { observe: 'response' }).pipe().subscribe({
+        next: (response: any) => {
+          if (response.status != 200 || !response.body) {
+            localStorage.clear();
+            window.location.href = '/login';
+          }
+        }, error: (error) => {
+          localStorage.clear();
+          window.location.href = '/login';
+        }
+      });
+    } catch (error) {
+      localStorage.clear();
+      window.location.href = '/login';
+    }
+  }
+
   onScroll(event: any) {
     if (event.target.scrollTop === 0) {
       const scrollMax = event.target.scrollTopMax;
-      console.log('Scroll max:', scrollMax);
-      console.log('Scrolled to top');
-      console.log('Old messages:', this.oldMessagesList);
       if (this.oldMessagesList.length > 0) {
         this.getChatHistory(this.oldMessagesList[this.oldMessagesList.length - 1].message.id);
         event.target.scrollTop = event.target.scrollTopMax - scrollMax;
@@ -141,12 +162,12 @@ export class HomeComponent {
   }
 
   sendMessage() {
+    this.checkLogin();
     const chatBar = document.getElementById('chat-bar') as HTMLInputElement;
     if (!this.activeChat || chatBar.value === '') {
       chatBar.value = '';
       chatBar.style.height = "1.2em";
     } else {
-      console.log('Sending message', chatBar.value);
       const message = { message: chatBar.value, content: chatBar.value, time: new Date().toLocaleString(), user_id: this.user.id, chat_id: this.activeChat?.chat.id, username: this.user.username };
       chatBar.value = '';
       chatBar.style.height = "1.2em";
@@ -166,8 +187,6 @@ export class HomeComponent {
   }
 
   refreshChatListItem(chat: ChatListItemComponent) {
-    console.log(this.chatList);
-    console.log(document.getElementById('chat-list')?.childNodes);
     const index = this.chatList.indexOf(chat);
     if (index != this.chatList.length - 1) {
       this.chatList.splice(index, 1);
@@ -180,7 +199,7 @@ export class HomeComponent {
   }
 
   openChat(openedChat?: ChatListItemComponent) {
-    // this.socketSubscription.unsubscribe();
+    this.checkLogin();
     console.log('Opening chat', openedChat);
     this.chatList.forEach((chat: ChatListItemComponent) => {
       if (chat !== openedChat) {
@@ -201,11 +220,11 @@ export class HomeComponent {
   }
 
   createChat() {
+    this.checkLogin();
     console.log('Creating chat');
     const input = document.getElementById('new-chat-input') as HTMLInputElement;
     const chatName = input.value;
     if (chatName !== '') {
-      console.log('Chat name:', chatName);
       input.value = '';
 
       const popup = document.getElementById('new-chat-popup') as HTMLElement;
@@ -216,6 +235,7 @@ export class HomeComponent {
   }
 
   openPopup() {
+    this.checkLogin();
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'flex';
   }
@@ -223,18 +243,6 @@ export class HomeComponent {
   closePopup() {
     const popup = document.getElementById('new-chat-popup') as HTMLElement;
     popup.style.display = 'none';
-  }
-
-  leaveChat() {
-    // console.log('Leaving chat');
-    // fetch('http://localhost:3000/leave?' + new URLSearchParams({ chat: this.activeChat?.chat.id }).toString(), {
-    //   method: 'POST'
-    // }).then((response) => {
-    //   console.log('Left chat:', response);
-    //   window.location.reload();
-    // }).catch((error) => {
-    //   console.error(error);
-    // });
   }
 
   clearChatHistory() {
@@ -253,10 +261,10 @@ export class HomeComponent {
   }
 
   getChatHistory(max_id: number = 0, limit: number = 20, chatId: number = this.activeChat?.chat.id) {
+    this.checkLogin();
     console.log('Getting chat history');
 
     this.http.get(environment.backend + '/messages/chat/' + chatId + '?max_id=' + max_id + '&limit=' + limit).subscribe((data: any) => {
-      console.log('Chat history:', data);
       data.forEach((message: any) => {
         message.time = new Date(message.time).toLocaleString();
         this.addOldMessage(message);

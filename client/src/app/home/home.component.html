@@ -5,9 +5,6 @@
                 <div class="left">
                     <button id="new-chat" class="btn btn-primary" (click)="openPopup()">Neuer Chat</button>
                 </div>
-                <div class="right">
-                    <a href="/profile" class="btn btn-secondary">Profil</a>
-                </div>
             </div>
             <ul id="chat-list">
                 <ng-template #chatInsertPoint></ng-template>
@@ -19,15 +16,12 @@
                     <h2 id="chat-info-name"></h2>
                 </div>
                 <div class="right">
-                    <button id="leave-chat" class="btn btn-secondary" (click)="leaveChat()">Verlassen</button>
                 </div>
             </div>
             <div id="chat" class="bordered">
-                <!-- <div id="distance-block"></div> -->
-                <!-- <div id="chat-aligner"> -->
                 <div id="chat-history" (scroll)="onScroll($event)">
                     <div id="old">
-                        <div>Kein Chat gewählt.</div>
+                        <div style="margin-left: 1em; margin-top: 1em;">Kein Chat gewählt.</div>
                         <ng-template #oldInsertPoint></ng-template>
                     </div>
                     <div id="new">
@@ -39,7 +33,6 @@
                         oninput='this.style.height = "";this.style.height = this.scrollHeight - 16 + "px"'></textarea>
                     <button id="chat-send" class="btn btn-primary" (click)="sendMessage()">Send</button>
                 </div>
-                <!-- </div> -->
             </div>
         </div>
     </div>
